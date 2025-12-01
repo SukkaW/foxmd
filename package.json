@@ -1,9 +1,9 @@
 {
   "name": "foxmd",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "An opinionated Markdown to React transformer for React Server Component",
   "repository": {
-    "url": "https://github.com/SukkaW/foxts"
+    "url": "https://github.com/SukkaW/foxmd"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
