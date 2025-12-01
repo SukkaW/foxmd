@@ -12,7 +12,8 @@ export type CustomRendererMethods = Partial<Omit<FoxmdRenderer, 'elIdList' | 'el
 export interface FoxmdRendererOptions {
   suppressHydrationWarning?: boolean,
   customRenderMethods?: CustomRendererMethods,
-  specialImageSizeInTitleOrAlt?: boolean
+  specialImageSizeInTitleOrAlt?: boolean,
+  UNSAFE_allowHtml?: boolean
 }
 
 const knownLangMap = new Map([
@@ -27,7 +28,8 @@ const knownLangMap = new Map([
 
 function createInternalFoxmdRenderer(
   suppressHydrationWarning: boolean,
-  specialImageSizeInTitleOrAlt: boolean
+  specialImageSizeInTitleOrAlt: boolean,
+  UNSAFE_allowHtml: boolean
 ) {
   const elIdList: number[] = [];
 
@@ -172,8 +174,13 @@ function createInternalFoxmdRenderer(
       return text;
     },
 
-    // TODO: fix dangerous html
-    html(html: ReactNode) {
+    html(html: string) {
+      if (UNSAFE_allowHtml) {
+        return h('div', null, {
+          dangerouslySetInnerHTML: { __html: html },
+          style: { display: 'contents' }
+        });
+      }
       return html;
     },
 
@@ -190,11 +197,13 @@ function createInternalFoxmdRenderer(
 export function createFoxmdRenderer({
   suppressHydrationWarning = false,
   specialImageSizeInTitleOrAlt = true,
-  customRenderMethods = {}
+  customRenderMethods = {},
+  UNSAFE_allowHtml = false
 }: FoxmdRendererOptions = {}) {
   const renderer = createInternalFoxmdRenderer(
     suppressHydrationWarning,
-    specialImageSizeInTitleOrAlt
+    specialImageSizeInTitleOrAlt,
+    UNSAFE_allowHtml
   );
   return {
     ...renderer,
