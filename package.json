@@ -39,7 +39,11 @@
   "author": "SukkaW <https://skk.moe>",
   "license": "MIT",
   "dependencies": {
-    "marked": "^17.0.1"
+    "fast-escape-regexp": "^1.0.1",
+    "foxts": "^5.0.2",
+    "html-entities": "^2.6.0",
+    "marked": "^17.0.1",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.7",
@@ -49,6 +53,9 @@
     "eslint-config-sukka": "^8.0.5",
     "eslint-formatter-sukka": "^8.0.5",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@types/react": "*"
   },
   "packageManager": "pnpm@10.24.0",
   "pnpm": {

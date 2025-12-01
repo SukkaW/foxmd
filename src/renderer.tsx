@@ -1,0 +1,155 @@
+import type { ReactNode } from 'react';
+import { createElement } from 'react';
+
+export type HeadingLevels = 1 | 2 | 3 | 4 | 5 | 6;
+export interface TableFlags {
+  header?: boolean,
+  align?: 'center' | 'left' | 'right' | undefined
+}
+
+export type CustomRendererMethods = Partial<Omit<FoxmdRenderer, 'elIdList' | 'elementId'>>;
+
+export interface FoxmdRendererOptions {
+  suppressHydrationWarning?: boolean,
+  customRenderMethods?: CustomRendererMethods
+}
+
+function createInternalFoxmdRenderer(suppressHydrationWarning: boolean) {
+  const elIdList: number[] = [];
+
+  const incrementElId = () => {
+    elIdList[elIdList.length - 1] += 1;
+  };
+
+  function getElementId() {
+    return elIdList.join('-');
+  }
+
+  function h<T extends keyof React.JSX.IntrinsicElements>(el: T, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
+    const elProps = {
+      key: `marked-react-${getElementId()}`,
+      suppressHydrationWarning
+    };
+
+    incrementElId();
+    return createElement(el, { ...props, ...elProps }, children);
+  }
+
+  return {
+    get elIdList() {
+      return elIdList;
+    },
+    get elementId() {
+      return getElementId();
+    },
+
+    heading(children: ReactNode, level: HeadingLevels, id?: string) {
+      return h(`h${level}`, children, { id });
+    },
+
+    paragraph(children: ReactNode) {
+      return h('p', children);
+    },
+
+    link(href: string, text: ReactNode) {
+      return h('a', text, { href, target: undefined });
+    },
+
+    image(src: string, alt: string, title?: string) {
+      return h('img', null, { src, alt, title });
+    },
+
+    codespan(code: ReactNode, lang: string | null = null) {
+      // TODO: add shiki here
+      const className = lang ? `language-${lang}` : undefined;
+      return h('code', code, { className });
+    },
+
+    code(code: ReactNode, lang: string | undefined) {
+      return h('pre', this.codespan(code, lang));
+    },
+
+    blockquote(children: ReactNode) {
+      return h('blockquote', children);
+    },
+
+    list(children: ReactNode, ordered: boolean, start: number | undefined) {
+      return h(ordered ? 'ol' : 'ul', children, ordered && start !== 1 ? { start } : {});
+    },
+
+    listItem(children: ReactNode[]) {
+      return h('li', children);
+    },
+
+    // eslint-disable-next-line sukka/bool-param-default -- renderer method
+    checkbox(checked: boolean | undefined) {
+      return h('input', null, {
+        type: 'checkbox',
+        disabled: true,
+        checked
+      });
+    },
+
+    table(children: ReactNode[]) {
+      return h('table', children);
+    },
+
+    tableHeader(children: ReactNode) {
+      return h('thead', children);
+    },
+
+    tableBody(children: ReactNode[]) {
+      return h('tbody', children);
+    },
+
+    tableRow(children: ReactNode[]) {
+      return h('tr', children);
+    },
+
+    tableCell(children: ReactNode[], flags: TableFlags) {
+      const tag = flags.header ? 'th' : 'td';
+      return h(tag, children, { align: flags.align });
+    },
+
+    strong(children: ReactNode) {
+      return h('strong', children);
+    },
+
+    em(children: ReactNode) {
+      return h('em', children);
+    },
+
+    del(children: ReactNode) {
+      return h('del', children);
+    },
+
+    text(text: ReactNode) {
+      return text;
+    },
+
+    html(html: ReactNode) {
+      return html;
+    },
+
+    hr() {
+      return h('hr');
+    },
+
+    br() {
+      return h('br');
+    }
+  };
+}
+
+export function createFoxmdRenderer({
+  suppressHydrationWarning = false,
+  customRenderMethods = {}
+}: FoxmdRendererOptions = {}) {
+  const renderer = createInternalFoxmdRenderer(suppressHydrationWarning);
+  return {
+    ...renderer,
+    ...customRenderMethods
+  };
+}
+
+export type FoxmdRenderer = ReturnType<typeof createInternalFoxmdRenderer>;
