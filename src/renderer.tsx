@@ -11,10 +11,14 @@ export type CustomRendererMethods = Partial<Omit<FoxmdRenderer, 'elIdList' | 'el
 
 export interface FoxmdRendererOptions {
   suppressHydrationWarning?: boolean,
-  customRenderMethods?: CustomRendererMethods
+  customRenderMethods?: CustomRendererMethods,
+  specialImageSizeInTitleOrAlt?: boolean
 }
 
-function createInternalFoxmdRenderer(suppressHydrationWarning: boolean) {
+function createInternalFoxmdRenderer(
+  suppressHydrationWarning: boolean,
+  specialImageSizeInTitleOrAlt: boolean
+) {
   const elIdList: number[] = [];
 
   function getElementId() {
@@ -48,12 +52,40 @@ function createInternalFoxmdRenderer(suppressHydrationWarning: boolean) {
       return h('p', children);
     },
 
-    link(href: string, text: ReactNode) {
-      return h('a', text, { href, target: undefined });
+    link(href: string, text: ReactNode, title?: string) {
+      if (href.startsWith('javascript:') || href.startsWith('data:') || href.startsWith('vbscript:')) {
+        href = '';
+      }
+
+      return h('a', text, { href, title, target: undefined });
     },
 
     image(src: string, alt: string, title?: string) {
-      return h('img', null, { src, alt, title });
+      let width: string | undefined;
+      let height: string | undefined;
+
+      if (specialImageSizeInTitleOrAlt) {
+        if (alt.includes('|')) {
+          const [newAlt, sizeOrImageLocalPath] = alt.split('|');
+          // eslint-disable-next-line @typescript-eslint/prefer-optional-chain -- empty string check
+          if (sizeOrImageLocalPath && sizeOrImageLocalPath.includes('x')) {
+            [width, height] = sizeOrImageLocalPath.split('x').map(i => i.trim());
+            alt = newAlt;
+          }
+        }
+        if (
+          (width === undefined || height === undefined)
+          && title?.includes('size:')
+        ) {
+          title = title.replace(/size:(\d+)x(\d+)/, ($, w, h) => {
+            width = w;
+            height = h;
+            return '';
+          });
+        }
+      }
+
+      return h('img', null, { src, alt, title, width, height });
     },
 
     codespan(code: ReactNode, lang: string | null = null) {
@@ -140,9 +172,13 @@ function createInternalFoxmdRenderer(suppressHydrationWarning: boolean) {
 
 export function createFoxmdRenderer({
   suppressHydrationWarning = false,
+  specialImageSizeInTitleOrAlt = true,
   customRenderMethods = {}
 }: FoxmdRendererOptions = {}) {
-  const renderer = createInternalFoxmdRenderer(suppressHydrationWarning);
+  const renderer = createInternalFoxmdRenderer(
+    suppressHydrationWarning,
+    specialImageSizeInTitleOrAlt
+  );
   return {
     ...renderer,
     ...customRenderMethods

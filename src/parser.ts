@@ -171,7 +171,7 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
 
         case 'link': {
           renderer.incrementElId();
-          return renderer.link(token.href, parseInline(token.tokens));
+          return renderer.link(token.href, parseInline(token.tokens), token.title ?? undefined);
         }
 
         case 'image': {
