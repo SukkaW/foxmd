@@ -33,10 +33,12 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
             headingIds.set(id, headingIndex);
           }
 
+          renderer.incrementElId();
           return renderer.heading(parseInline(token.tokens), level, id);
         }
 
         case 'paragraph': {
+          renderer.incrementElId();
           return renderer.paragraph(parseInline(token.tokens));
         }
 
@@ -48,6 +50,8 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
         case 'blockquote': {
           const blockquoteToken = token as Tokens.Blockquote;
           const quote = parse(blockquoteToken.tokens);
+
+          renderer.incrementElId();
           return renderer.blockquote(quote);
         }
 
@@ -59,23 +63,28 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
             const listItemChildren = [];
 
             if (item.task) {
+              renderer.incrementElId();
               listItemChildren.push(renderer.checkbox(item.checked ?? false));
             }
 
             listItemChildren.push(parse(item.tokens));
 
+            renderer.incrementElId();
             return renderer.listItem(listItemChildren);
           });
           renderer.elIdList.pop();
 
+          renderer.incrementElId();
           return renderer.list(children, token.ordered, token.ordered ? token.start : undefined);
         }
 
         case 'code': {
+          renderer.incrementElId();
           return renderer.code(token.text, token.lang);
         }
 
         case 'html': {
+          renderer.incrementElId();
           return renderer.html(token.text);
         }
 
@@ -89,7 +98,9 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
           }));
           renderer.elIdList.pop();
 
+          renderer.incrementElId();
           const headerRow = renderer.tableRow(headerCells);
+          renderer.incrementElId();
           const header = renderer.tableHeader(headerRow);
 
           renderer.elIdList.push(0);
@@ -101,16 +112,20 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
             }));
             renderer.elIdList.pop();
 
+            renderer.incrementElId();
             return renderer.tableRow(rowChildren);
           });
           renderer.elIdList.pop();
 
+          renderer.incrementElId();
           const body = renderer.tableBody(bodyChilren);
 
+          renderer.incrementElId();
           return renderer.table([header, body]);
         }
 
         case 'hr': {
+          renderer.incrementElId();
           return renderer.hr();
         }
 
@@ -130,42 +145,52 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
     const result = tokens.map((token) => {
       switch (token.type) {
         case 'text': {
+          renderer.incrementElId();
           return renderer.text(decode(token.text));
         }
 
         case 'strong': {
+          renderer.incrementElId();
           return renderer.strong(parseInline(token.tokens));
         }
 
         case 'em': {
+          renderer.incrementElId();
           return renderer.em(parseInline(token.tokens));
         }
 
         case 'del': {
+          renderer.incrementElId();
           return renderer.del(parseInline(token.tokens));
         }
 
         case 'codespan': {
+          renderer.incrementElId();
           return renderer.codespan(decode(token.text));
         }
 
         case 'link': {
+          renderer.incrementElId();
           return renderer.link(token.href, parseInline(token.tokens));
         }
 
         case 'image': {
+          renderer.incrementElId();
           return renderer.image(token.href, token.text, token.title);
         }
 
         case 'html': {
+          renderer.incrementElId();
           return renderer.html(token.text);
         }
 
         case 'br': {
+          renderer.incrementElId();
           return renderer.br();
         }
 
         case 'escape': {
+          renderer.incrementElId();
           return renderer.text(token.text);
         }
 

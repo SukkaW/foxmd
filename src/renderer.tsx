@@ -7,7 +7,7 @@ export interface TableFlags {
   align?: 'center' | 'left' | 'right' | undefined
 }
 
-export type CustomRendererMethods = Partial<Omit<FoxmdRenderer, 'elIdList' | 'elementId'>>;
+export type CustomRendererMethods = Partial<Omit<FoxmdRenderer, 'elIdList' | 'elementId' | 'incrementElId'>>;
 
 export interface FoxmdRendererOptions {
   suppressHydrationWarning?: boolean,
@@ -16,10 +16,6 @@ export interface FoxmdRendererOptions {
 
 function createInternalFoxmdRenderer(suppressHydrationWarning: boolean) {
   const elIdList: number[] = [];
-
-  const incrementElId = () => {
-    elIdList[elIdList.length - 1] += 1;
-  };
 
   function getElementId() {
     return elIdList.join('-');
@@ -30,8 +26,6 @@ function createInternalFoxmdRenderer(suppressHydrationWarning: boolean) {
       key: `marked-react-${getElementId()}`,
       suppressHydrationWarning
     };
-
-    incrementElId();
     return createElement(el, { ...props, ...elProps }, children);
   }
 
@@ -41,6 +35,9 @@ function createInternalFoxmdRenderer(suppressHydrationWarning: boolean) {
     },
     get elementId() {
       return getElementId();
+    },
+    incrementElId() {
+      elIdList[elIdList.length - 1] += 1;
     },
 
     heading(children: ReactNode, level: HeadingLevels, id?: string) {
