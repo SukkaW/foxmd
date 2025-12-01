@@ -8,6 +8,9 @@ import type { FoxmdRendererOptions } from './renderer';
 import { createFoxmdParser } from './parser';
 import type { FoxmdParserOptions } from './parser';
 
+export type { FoxmdRendererOptions, FoxmdParserOptions };
+export { createFoxmdRenderer, createFoxmdParser };
+
 const defaultMarkedInstance = lazyValue<Marked>(() => new Marked());
 
 export interface FoxmdOptions {
