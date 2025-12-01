@@ -9,17 +9,23 @@ import { createFoxmdParser } from './parser';
 
 const defaultMarkedInstance = lazyValue<Marked>(() => new Marked());
 
+export interface FoxmdOptions {
+  foxmdRendererOptions?: FoxmdRendererOptions,
+  markedInstance?: Marked,
+  lexerOptions?: MarkedOptions,
+  isInline?: boolean
+}
+
 export function foxmd(
   markdownString: string,
-  markedInstance: Marked = defaultMarkedInstance() as Marked,
-  lexerOptions?: MarkedOptions,
-  foxmdRendererOptions?: FoxmdRendererOptions,
-  isInline = false
+  {
+    foxmdRendererOptions,
+    markedInstance = defaultMarkedInstance() as Marked,
+    lexerOptions = getDefaultMarkedLexerOptions(markedInstance),
+    isInline = false
+  }: FoxmdOptions = {}
 ): React.ReactNode[] {
-  const tokens = markedInstance.lexer(
-    markdownString,
-    lexerOptions ?? getDefaultMarkedLexerOptions(markedInstance)
-  );
+  const tokens = markedInstance.lexer(markdownString, lexerOptions);
 
   const parser = createFoxmdParser(createFoxmdRenderer(foxmdRendererOptions));
 
