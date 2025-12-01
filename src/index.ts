@@ -7,12 +7,12 @@ import { createFoxmdRenderer } from './renderer';
 import type { FoxmdRendererOptions } from './renderer';
 import { createFoxmdParser } from './parser';
 
-const defaultMarkedInstance = lazyValue<Marked<string, unknown>>(() => new Marked());
+const defaultMarkedInstance = lazyValue<Marked>(() => new Marked());
 
 export function foxmd(
   markdownString: string,
-  markedInstance: Marked<string, unknown> = defaultMarkedInstance() as Marked<string, unknown>,
-  lexerOptions?: MarkedOptions<string, unknown>,
+  markedInstance: Marked = defaultMarkedInstance() as Marked,
+  lexerOptions?: MarkedOptions,
   foxmdRendererOptions?: FoxmdRendererOptions,
   isInline = false
 ): React.ReactNode[] {
@@ -26,10 +26,10 @@ export function foxmd(
   return isInline ? parser.parseInline(tokens) : parser.parse(tokens);
 }
 
-function getDefaultMarkedLexerOptions(markedInstance: Marked<string, unknown>): MarkedOptions<string, unknown> {
+function getDefaultMarkedLexerOptions(markedInstance: Marked): MarkedOptions {
   return ({
     gfm: true,
     breaks: true,
     tokenizer: markedInstance.defaults.tokenizer
-  }) as MarkedOptions<string, unknown>;
+  }) as MarkedOptions;
 }

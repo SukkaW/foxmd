@@ -41,7 +41,7 @@
     "fast-escape-regexp": "^1.0.1",
     "foxts": "^5.0.2",
     "html-entities": "^2.6.0",
-    "marked": "^17.0.1",
+    "marked": "^15.0.12",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
