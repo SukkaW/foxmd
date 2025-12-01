@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import type { Token, Tokens } from 'marked';
 
 import type { HeadingLevels } from './renderer';
@@ -6,14 +5,39 @@ import type { FoxmdRenderer } from './renderer';
 import { decode } from 'html-entities';
 import { fastStringArrayJoin } from 'foxts/fast-string-array-join';
 import { slugize } from './utils';
+import type React from 'react';
 
-export function createFoxmdParser(renderer: FoxmdRenderer) {
+export interface FoxmdParserParseResult {
+  jsx: React.ReactNode[],
+  toc: Array<{
+    text: string,
+    id: string,
+    level: number
+  }>
+}
+
+export interface FoxmdParserOptions {
+  UNSAFE_pickSingleImageChildOutOfParentParagraph?: boolean
+}
+
+export function createFoxmdParser(
+  renderer: FoxmdRenderer,
+  {
+    UNSAFE_pickSingleImageChildOutOfParentParagraph = false
+  }: FoxmdParserOptions = {}
+) {
   const headingIds = new Map<string, number>();
 
-  function parse(tokens: Token[]): ReactNode[] {
+  function parse(tokens: Token[]): FoxmdParserParseResult {
+    const tocObj: Array<{
+      text: string,
+      id: string,
+      level: number
+    }> = [];
+
     renderer.elIdList.push(0);
 
-    const result = tokens.map((token) => {
+    const result = tokens.map<React.ReactNode>((token) => {
       switch (token.type) {
         case 'space': {
           return null;
@@ -21,7 +45,8 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
 
         case 'heading': {
           const level = token.depth as HeadingLevels;
-          let id = slugize(getText(token.tokens));
+          const text = getText(token.tokens);
+          let id = slugize(text);
 
           let headingIndex = 1;
           if (headingIds.has(id)) {
@@ -33,23 +58,33 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
             headingIds.set(id, headingIndex);
           }
 
+          tocObj.push({ text, id, level });
+
           renderer.incrementElId();
-          return renderer.heading(parseInline(token.tokens), level, id);
+          return renderer.heading(parseInline(token.tokens).jsx, level, id);
         }
 
         case 'paragraph': {
+          if (
+            UNSAFE_pickSingleImageChildOutOfParentParagraph
+            && token.tokens?.length === 1
+            && token.tokens[0].type === 'image'
+          ) {
+            return parseInline(token.tokens).jsx;
+          }
+
           renderer.incrementElId();
-          return renderer.paragraph(parseInline(token.tokens));
+          return renderer.paragraph(parseInline(token.tokens).jsx);
         }
 
         case 'text': {
           const textToken = token as Tokens.Text;
-          return textToken.tokens ? parseInline(textToken.tokens) : token.text;
+          return textToken.tokens ? parseInline(textToken.tokens).jsx : token.text;
         }
 
         case 'blockquote': {
           const blockquoteToken = token as Tokens.Blockquote;
-          const quote = parse(blockquoteToken.tokens);
+          const quote = parse(blockquoteToken.tokens).jsx;
 
           renderer.incrementElId();
           return renderer.blockquote(quote);
@@ -60,14 +95,14 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
 
           renderer.elIdList.push(0);
           const children = listToken.items.map((item) => {
-            const listItemChildren = [];
+            const listItemChildren: React.ReactNode[] = [];
 
             if (item.task) {
               renderer.incrementElId();
               listItemChildren.push(renderer.checkbox(item.checked ?? false));
             }
 
-            listItemChildren.push(parse(item.tokens));
+            listItemChildren.push(parse(item.tokens).jsx);
 
             renderer.incrementElId();
             return renderer.listItem(listItemChildren);
@@ -92,7 +127,7 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
           const tableToken = token as Tokens.Table;
 
           renderer.elIdList.push(0);
-          const headerCells = tableToken.header.map((cell, index) => renderer.tableCell(parseInline(cell.tokens), {
+          const headerCells = tableToken.header.map((cell, index) => renderer.tableCell(parseInline(cell.tokens).jsx, {
             header: true,
             align: token.align[index]
           }));
@@ -106,7 +141,7 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
           renderer.elIdList.push(0);
           const bodyChilren = tableToken.rows.map((row) => {
             renderer.elIdList.push(0);
-            const rowChildren = row.map((cell, index) => renderer.tableCell(parseInline(cell.tokens), {
+            const rowChildren = row.map((cell, index) => renderer.tableCell(parseInline(cell.tokens).jsx, {
               header: false,
               align: token.align[index]
             }));
@@ -137,10 +172,13 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
       }
     });
     renderer.elIdList.pop();
-    return result;
+    return {
+      jsx: result,
+      toc: tocObj
+    };
   };
 
-  function parseInline(tokens: Token[] = []): ReactNode[] {
+  function parseInline(tokens: Token[] = []): FoxmdParserParseResult {
     renderer.elIdList.push(0);
     const result = tokens.map((token) => {
       switch (token.type) {
@@ -151,17 +189,17 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
 
         case 'strong': {
           renderer.incrementElId();
-          return renderer.strong(parseInline(token.tokens));
+          return renderer.strong(parseInline(token.tokens).jsx);
         }
 
         case 'em': {
           renderer.incrementElId();
-          return renderer.em(parseInline(token.tokens));
+          return renderer.em(parseInline(token.tokens).jsx);
         }
 
         case 'del': {
           renderer.incrementElId();
-          return renderer.del(parseInline(token.tokens));
+          return renderer.del(parseInline(token.tokens).jsx);
         }
 
         case 'codespan': {
@@ -171,7 +209,7 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
 
         case 'link': {
           renderer.incrementElId();
-          return renderer.link(token.href, parseInline(token.tokens), token.title ?? undefined);
+          return renderer.link(token.href, parseInline(token.tokens).jsx, token.title ?? undefined);
         }
 
         case 'image': {
@@ -202,7 +240,10 @@ export function createFoxmdParser(renderer: FoxmdRenderer) {
       }
     });
     renderer.elIdList.pop();
-    return result;
+    return {
+      jsx: result,
+      toc: [] as never[]
+    };
   }
 
   return {

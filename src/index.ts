@@ -24,7 +24,7 @@ export function foxmd(
     lexerOptions = getDefaultMarkedLexerOptions(markedInstance),
     isInline = false
   }: FoxmdOptions = {}
-): React.ReactNode[] {
+) {
   const tokens = markedInstance.lexer(markdownString, lexerOptions);
 
   const parser = createFoxmdParser(createFoxmdRenderer(foxmdRendererOptions));

@@ -15,6 +15,16 @@ export interface FoxmdRendererOptions {
   specialImageSizeInTitleOrAlt?: boolean
 }
 
+const knownLangMap = new Map([
+  ['bash', 'shell'],
+  ['zsh', 'shell'],
+  ['sh', 'shell'],
+  ['js', 'javascript'],
+  ['ts', 'typescript'],
+  ['py', 'python'],
+  ['yml', 'yaml']
+]);
+
 function createInternalFoxmdRenderer(
   suppressHydrationWarning: boolean,
   specialImageSizeInTitleOrAlt: boolean
@@ -27,7 +37,7 @@ function createInternalFoxmdRenderer(
 
   function h<T extends keyof React.JSX.IntrinsicElements>(el: T, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
     const elProps = {
-      key: `marked-react-${getElementId()}`,
+      key: 'foxmd-' + getElementId(),
       suppressHydrationWarning
     };
     return createElement(el, { ...props, ...elProps }, children);
@@ -94,8 +104,14 @@ function createInternalFoxmdRenderer(
       return h('code', code, { className });
     },
 
-    code(code: ReactNode, lang: string | undefined) {
-      return h('pre', this.codespan(code, lang));
+    code(code: ReactNode, lang: string | undefined = '') {
+      return h(
+        'pre', this.codespan(code, lang),
+        {
+          // @ts-expect-error -- data attribute
+          'data-language': (knownLangMap.has(lang) ? knownLangMap.get(lang)! : lang).toUpperCase()
+        }
+      );
     },
 
     blockquote(children: ReactNode) {
@@ -156,6 +172,7 @@ function createInternalFoxmdRenderer(
       return text;
     },
 
+    // TODO: fix dangerous html
     html(html: ReactNode) {
       return html;
     },
