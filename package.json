@@ -40,7 +40,7 @@
   "dependencies": {
     "domhandler": "^5.0.3",
     "fast-escape-regexp": "^1.0.1",
-    "foxts": "^5.0.2",
+    "foxts": "^5.0.4",
     "html-entities": "^2.6.0",
     "htmlparser2": "^10.0.0",
     "marked": "^15.0.12",
@@ -51,19 +51,19 @@
     "@types/react": "^19.2.7",
     "bumpp": "^10.3.2",
     "bunchee": "^6.6.2",
-    "eslint": "^9.39.1",
-    "eslint-config-sukka": "^8.0.5",
-    "eslint-formatter-sukka": "^8.0.5",
+    "eslint": "^9.39.2",
+    "eslint-config-sukka": "^8.0.6",
+    "eslint-formatter-sukka": "^8.0.6",
     "html-tags": "^5.1.0",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "@types/react": "*"
   },
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.26.1",
   "pnpm": {
     "overrides": {
-      "eslint>chalk": "npm:ansis@^3.17.0"
+      "eslint>chalk": "npm:ansis@3.17.0"
     },
     "onlyBuiltDependencies": [
       "@swc/core",

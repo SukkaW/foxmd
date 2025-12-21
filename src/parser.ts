@@ -37,6 +37,9 @@ export function createFoxmdParser(
 
     renderer.elIdList.push(0);
 
+    let inRawBlock = false;
+    let bufferedRawBlockToken = '';
+
     const result = tokens.map<React.ReactNode>((token): React.ReactNode => {
       switch (token.type) {
         case 'space': {
@@ -79,6 +82,11 @@ export function createFoxmdParser(
 
         case 'text': {
           const textToken = token as Tokens.Text;
+          if (inRawBlock) {
+            bufferedRawBlockToken += token.text;
+            return null;
+          }
+
           return textToken.tokens ? parseInline(textToken.tokens).jsx : token.text;
         }
 
@@ -119,8 +127,18 @@ export function createFoxmdParser(
         }
 
         case 'html': {
+          if ('inRawBlock' in token) { // pre|code|kbd|script
+            inRawBlock = token.inRawBlock;
+          }
+          if (inRawBlock) {
+            bufferedRawBlockToken += token.text;
+            return null;
+          }
+
           renderer.incrementElId();
-          return renderer.html(token.text);
+          const node = renderer.html(bufferedRawBlockToken);
+          bufferedRawBlockToken = '';
+          return node;
         }
 
         case 'table': {
@@ -186,9 +204,18 @@ export function createFoxmdParser(
 
   function parseInline(tokens: Token[] = []): FoxmdParserParseResult {
     renderer.elIdList.push(0);
+
+    let inRawBlock = false;
+    let bufferedRawBlockToken = '';
+
     const result = tokens.map<React.ReactNode>((token): React.ReactNode => {
       switch (token.type) {
         case 'text': {
+          if (inRawBlock) {
+            bufferedRawBlockToken += token.text;
+            return null;
+          }
+
           renderer.incrementElId();
           return renderer.text(decode(token.text));
         }
@@ -224,8 +251,18 @@ export function createFoxmdParser(
         }
 
         case 'html': {
+          if ('inRawBlock' in token) { // pre|code|kbd|script
+            inRawBlock = token.inRawBlock;
+          }
+          if (inRawBlock) {
+            bufferedRawBlockToken += token.text;
+            return null;
+          }
+
           renderer.incrementElId();
-          return renderer.html(token.text);
+          const node = renderer.html(bufferedRawBlockToken);
+          bufferedRawBlockToken = '';
+          return node;
         }
 
         case 'br': {
