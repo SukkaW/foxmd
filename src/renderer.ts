@@ -106,13 +106,13 @@ function createInternalFoxmdRenderer(
       return h('img', null, { src, alt, title, width, height });
     },
 
-    codespan(code: ReactNode, lang: string | null = null) {
+    codespan(code: string, lang: string | null = null) {
       // TODO: add shiki here
       const className = lang ? `language-${lang}` : undefined;
       return h('code', code, { className });
     },
 
-    code(code: ReactNode, lang: string | undefined = '') {
+    code(code: string, lang: string | undefined = '') {
       return h(
         'pre', this.codespan(code, lang),
         {
