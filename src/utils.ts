@@ -1,5 +1,5 @@
 export type HtmlTagReplaceReact = {
-  [TagName in keyof React.JSX.IntrinsicElements]?: React.ComponentType<TagName>
+  [TagName in keyof React.JSX.IntrinsicElements]?: React.ComponentType<React.ComponentPropsWithoutRef<TagName>>;
 };
 
 // export function getHtmlTagReplaceReact<T extends keyof HtmlTagReplaceReact>(
