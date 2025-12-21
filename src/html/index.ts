@@ -4,17 +4,20 @@ import type { ChildNode } from 'domhandler';
 
 import { domNodeToReactNode } from './dom-node-to-react-node';
 
-export function htmlToReact(html: string, elementId: string): React.ReactNode[] {
+import type { HtmlTagReplaceReact } from '../utils';
+
+export function htmlToReact(html: string, elementId: string, customReactComponentsForHtmlTags: HtmlTagReplaceReact): React.ReactNode[] {
   const handler = new DomHandler();
   const parser = new HtmlParser(handler, { decodeEntities: true });
   parser.parseComplete(html);
 
-  return handler.dom.map((node, index) => traverseDom(node, index, elementId, 0));
+  return handler.dom.map((node, index) => traverseDom(node, index, elementId, customReactComponentsForHtmlTags, 0));
 };
 
 function traverseDom(
   node: ChildNode, index: number,
   elementId: string,
+  customReactComponentsForHtmlTags: HtmlTagReplaceReact,
   level = 0
 ): React.ReactNode | null {
   if (isDirective(node)) {
@@ -40,7 +43,7 @@ function traverseDom(
 
   if ('children' in node && node.children.length > 0) {
     children = node.children.reduce<React.ReactNode[]>((acc, child, i) => {
-      const node = traverseDom(child, i, elementId, level + 1);
+      const node = traverseDom(child, i, elementId, customReactComponentsForHtmlTags, level + 1);
       if (node != null) {
         acc.push(node);
       }
@@ -48,5 +51,5 @@ function traverseDom(
     }, []);
   }
 
-  return domNodeToReactNode(node, children, elementId, index, level);
+  return domNodeToReactNode(node, children, elementId, customReactComponentsForHtmlTags, index, level);
 };

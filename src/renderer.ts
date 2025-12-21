@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { createElement } from 'react';
 import { htmlToReact } from './html';
+import { getHtmlTagReplaceReact } from './utils';
+import type { HtmlTagReplaceReact } from './utils';
 
 export type HeadingLevels = 1 | 2 | 3 | 4 | 5 | 6;
 export interface TableFlags {
@@ -13,6 +15,7 @@ export type CustomRendererMethods = Partial<Omit<FoxmdRenderer, 'elIdList' | 'el
 export interface FoxmdRendererOptions {
   suppressHydrationWarning?: boolean,
   customRenderMethods?: CustomRendererMethods,
+  customReactComponentsForHtmlTags?: HtmlTagReplaceReact,
   specialImageSizeInTitleOrAlt?: boolean,
   UNSAFE_allowHtml?: boolean
 }
@@ -30,6 +33,7 @@ const knownLangMap = new Map([
 function createInternalFoxmdRenderer(
   suppressHydrationWarning: boolean,
   specialImageSizeInTitleOrAlt: boolean,
+  customReactComponentsForHtmlTags: HtmlTagReplaceReact,
   UNSAFE_allowHtml: boolean
 ) {
   const elIdList: number[] = [];
@@ -43,7 +47,8 @@ function createInternalFoxmdRenderer(
       key: 'foxmd-' + getElementId(),
       suppressHydrationWarning
     };
-    return createElement(el, { ...props, ...elProps }, children);
+    const Comp = getHtmlTagReplaceReact(el, customReactComponentsForHtmlTags);
+    return createElement(Comp, { ...props, ...elProps }, children);
   }
 
   return {
@@ -177,7 +182,7 @@ function createInternalFoxmdRenderer(
 
     html(html: string): React.ReactNode | React.ReactNode[] {
       if (UNSAFE_allowHtml) {
-        return htmlToReact(html, getElementId());
+        return htmlToReact(html, getElementId(), customReactComponentsForHtmlTags);
       }
       return html;
     },
@@ -196,11 +201,13 @@ export function createFoxmdRenderer({
   suppressHydrationWarning = false,
   specialImageSizeInTitleOrAlt = true,
   customRenderMethods = {},
+  customReactComponentsForHtmlTags = {},
   UNSAFE_allowHtml = false
 }: FoxmdRendererOptions = {}) {
   const renderer = createInternalFoxmdRenderer(
     suppressHydrationWarning,
     specialImageSizeInTitleOrAlt,
+    customReactComponentsForHtmlTags,
     UNSAFE_allowHtml
   );
   return {

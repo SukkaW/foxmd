@@ -1,17 +1,22 @@
-import { isDocument } from 'domhandler';
-import type { Element, Document } from 'domhandler';
-import styleToObject from 'style-to-object';
-import possibleStandardNames from './react-dom-possible-standard-names';
-import { htmlBooleanAttributes, htmlOverloadedBooleanAttributes } from './react-dom-boolean-proeprty';
+import { createElement, Fragment } from 'react';
 import type React from 'react';
 
-import { createElement, Fragment } from 'react';
+import { isDocument } from 'domhandler';
+import type { Element, Document } from 'domhandler';
+
+import styleToObject from 'style-to-object';
+
+import possibleStandardNames from './react-dom-possible-standard-names';
+import { htmlBooleanAttributes, htmlOverloadedBooleanAttributes } from './react-dom-boolean-proeprty';
+
+import { getHtmlTagReplaceReact } from '../utils';
+import type { HtmlTagReplaceReact } from '../utils';
 
 // will be bundled
 import { voidHtmlTags } from 'html-tags';
 import type { VoidHtmlTags } from 'html-tags';
 
-export function domNodeToReactNode(node: Element | Document, children: React.ReactNode[] | null, elementId: string, index: number, level: number) {
+export function domNodeToReactNode(node: Element | Document, children: React.ReactNode[] | null, elementId: string, customReactComponentsForHtmlTags: HtmlTagReplaceReact, index: number, level: number) {
   // The Custom Elements specification explicitly states that;
   // custom element names must contain a hyphen.
   // src: https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
@@ -93,21 +98,25 @@ export function domNodeToReactNode(node: Element | Document, children: React.Rea
   }
 
   if (isDocument(node)) {
+    props.key += '-fragment';
     return createElement(Fragment, props, children);
   }
+
+  props.key += props.key + '-' + node.name;
+
   if (isVoidHtmlTag(node.name)) {
     if (children?.length) {
       console.warn('[foxmd] Void HTML tag should not have children, foxmd push children after the self-closing tags.', { node, tag: node.name, children });
 
       return createElement(
-        Fragment, { key: props.key },
-        createElement(node.name, props),
+        Fragment, null,
+        createElement(getHtmlTagReplaceReact(node.name, customReactComponentsForHtmlTags), props),
         children
       );
     }
-    return createElement(node.name, props);
+    return createElement(getHtmlTagReplaceReact(node.name, customReactComponentsForHtmlTags), props);
   }
-  return createElement(node.name, props, children);
+  return createElement(getHtmlTagReplaceReact(node.name, customReactComponentsForHtmlTags), props, children);
 }
 
 const voidHtmlTagsSet = new Set<string>(voidHtmlTags);

@@ -1,3 +1,23 @@
+export type HtmlTagReplaceReact = {
+  [TagName in keyof React.JSX.IntrinsicElements]?: React.ComponentType<TagName>
+};
+
+// export function getHtmlTagReplaceReact<T extends keyof HtmlTagReplaceReact>(
+//   tag: T,
+//   customReactComponentsForHtmlTags: HtmlTagReplaceReact
+// ): HtmlTagReplaceReact[T];
+
+// This is to prevent "Expression produces a union type that is too complex to represent. ts(2590)"
+export function getHtmlTagReplaceReact(
+  tag: string,
+  customReactComponentsForHtmlTags: HtmlTagReplaceReact
+): string | React.ComponentType<any> {
+  return tag in customReactComponentsForHtmlTags
+    // @ts-expect-error --- IGNORE ---
+    ? customReactComponentsForHtmlTags[tag]
+    : tag;
+}
+
 // eslint-disable-next-line no-control-regex -- escaping
 const rControl = /[\u0000-\u001F]/g;
 const rSpecial = /[\s!"#$%&'()*+,./:;<=>?@[\\\]^_`{|}~-]+/g;
