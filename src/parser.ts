@@ -127,10 +127,13 @@ export function createFoxmdParser(
           const tableToken = token as Tokens.Table;
 
           renderer.elIdList.push(0);
-          const headerCells = tableToken.header.map((cell, index) => renderer.tableCell(parseInline(cell.tokens).jsx, {
-            header: true,
-            align: token.align[index]
-          }));
+          const headerCells = tableToken.header.map((cell, index) => {
+            renderer.incrementElId();
+            return renderer.tableCell(parseInline(cell.tokens).jsx, {
+              header: true,
+              align: token.align[index]
+            });
+          });
           renderer.elIdList.pop();
 
           renderer.incrementElId();
@@ -141,10 +144,13 @@ export function createFoxmdParser(
           renderer.elIdList.push(0);
           const bodyChilren = tableToken.rows.map((row) => {
             renderer.elIdList.push(0);
-            const rowChildren = row.map((cell, index) => renderer.tableCell(parseInline(cell.tokens).jsx, {
-              header: false,
-              align: token.align[index]
-            }));
+            const rowChildren = row.map((cell, index) => {
+              renderer.incrementElId();
+              return renderer.tableCell(parseInline(cell.tokens).jsx, {
+                header: false,
+                align: token.align[index]
+              });
+            });
             renderer.elIdList.pop();
 
             renderer.incrementElId();
