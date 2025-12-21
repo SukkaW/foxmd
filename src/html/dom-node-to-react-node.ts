@@ -16,14 +16,14 @@ import type { HtmlTagReplaceReact } from '../utils';
 import { voidHtmlTags } from 'html-tags';
 import type { VoidHtmlTags } from 'html-tags';
 
-export function domNodeToReactNode(node: Element | Document, children: React.ReactNode[] | null, elementId: string, customReactComponentsForHtmlTags: HtmlTagReplaceReact, index: number, level: number) {
+export function domNodeToReactNode(node: Element | Document, children: React.ReactNode[] | null, elementId: string, customReactComponentsForHtmlTags: HtmlTagReplaceReact, index: number) {
   // The Custom Elements specification explicitly states that;
   // custom element names must contain a hyphen.
   // src: https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
   const isCustomElementNode = 'name' in node && node.name.includes('-');
 
   const props: Record<string, any> = {
-    key: 'foxmd-html-' + elementId + '-' + level + '-' + index
+    key: 'foxmd-html-' + elementId + '-' + index + ('name' in node ? '-' + node.name : '')
   };
   if ('attribs' in node && node.attribs) {
     for (let key in node.attribs) {
@@ -98,11 +98,8 @@ export function domNodeToReactNode(node: Element | Document, children: React.Rea
   }
 
   if (isDocument(node)) {
-    props.key += '-fragment';
     return createElement(Fragment, props, children);
   }
-
-  props.key += props.key + '-' + node.name;
 
   if (isVoidHtmlTag(node.name)) {
     if (children?.length) {

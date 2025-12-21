@@ -11,14 +11,13 @@ export function htmlToReact(html: string, elementId: string, customReactComponen
   const parser = new HtmlParser(handler, { decodeEntities: true });
   parser.parseComplete(html);
 
-  return handler.dom.map((node, index) => traverseDom(node, index, elementId, customReactComponentsForHtmlTags, 0));
+  return handler.dom.map((node, index) => traverseDom(node, index, elementId, customReactComponentsForHtmlTags));
 };
 
 function traverseDom(
   node: ChildNode, index: number,
   elementId: string,
-  customReactComponentsForHtmlTags: HtmlTagReplaceReact,
-  level = 0
+  customReactComponentsForHtmlTags: HtmlTagReplaceReact
 ): React.ReactNode | null {
   if (isDirective(node)) {
     return null;
@@ -43,7 +42,7 @@ function traverseDom(
 
   if ('children' in node && node.children.length > 0) {
     children = node.children.reduce<React.ReactNode[]>((acc, child, i) => {
-      const node = traverseDom(child, i, elementId, customReactComponentsForHtmlTags, level + 1);
+      const node = traverseDom(child, i, elementId + '-' + index, customReactComponentsForHtmlTags);
       if (node != null) {
         acc.push(node);
       }
@@ -51,5 +50,5 @@ function traverseDom(
     }, []);
   }
 
-  return domNodeToReactNode(node, children, elementId, customReactComponentsForHtmlTags, index, level);
+  return domNodeToReactNode(node, children, elementId, customReactComponentsForHtmlTags, index);
 };

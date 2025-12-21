@@ -44,7 +44,7 @@ function createInternalFoxmdRenderer(
 
   function h<T extends keyof React.JSX.IntrinsicElements>(el: T, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
     const elProps = {
-      key: 'foxmd-' + getElementId(),
+      key: 'foxmd-' + getElementId() + '-' + el,
       suppressHydrationWarning
     };
     const Comp = getHtmlTagReplaceReact(el, customReactComponentsForHtmlTags);
