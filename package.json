@@ -38,11 +38,14 @@
   "author": "SukkaW <https://skk.moe>",
   "license": "MIT",
   "dependencies": {
+    "domhandler": "^5.0.3",
     "fast-escape-regexp": "^1.0.1",
     "foxts": "^5.0.2",
     "html-entities": "^2.6.0",
+    "htmlparser2": "^10.0.0",
     "marked": "^15.0.12",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "style-to-object": "^1.0.14"
   },
   "devDependencies": {
     "@types/react": "^19.2.7",
@@ -51,6 +54,7 @@
     "eslint": "^9.39.1",
     "eslint-config-sukka": "^8.0.5",
     "eslint-formatter-sukka": "^8.0.5",
+    "html-tags": "^5.1.0",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {

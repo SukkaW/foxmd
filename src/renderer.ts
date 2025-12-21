@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { createElement } from 'react';
+import { htmlToReact } from './html';
 
 export type HeadingLevels = 1 | 2 | 3 | 4 | 5 | 6;
 export interface TableFlags {
@@ -174,12 +175,9 @@ function createInternalFoxmdRenderer(
       return text;
     },
 
-    html(html: string) {
+    html(html: string): React.ReactNode | React.ReactNode[] {
       if (UNSAFE_allowHtml) {
-        return h('div', null, {
-          dangerouslySetInnerHTML: { __html: html },
-          style: { display: 'contents' }
-        });
+        return htmlToReact(html, getElementId());
       }
       return html;
     },

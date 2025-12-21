@@ -37,7 +37,7 @@ export function createFoxmdParser(
 
     renderer.elIdList.push(0);
 
-    const result = tokens.map<React.ReactNode>((token) => {
+    const result = tokens.map<React.ReactNode>((token): React.ReactNode => {
       switch (token.type) {
         case 'space': {
           return null;
@@ -180,7 +180,7 @@ export function createFoxmdParser(
 
   function parseInline(tokens: Token[] = []): FoxmdParserParseResult {
     renderer.elIdList.push(0);
-    const result = tokens.map((token) => {
+    const result = tokens.map<React.ReactNode>((token): React.ReactNode => {
       switch (token.type) {
         case 'text': {
           renderer.incrementElId();
