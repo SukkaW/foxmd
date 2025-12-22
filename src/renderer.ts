@@ -62,12 +62,13 @@ function createInternalFoxmdRenderer(
 ): FoxmdCustomRendererMethods {
   function h<T extends keyof React.JSX.IntrinsicElements>(el: T, reactKey: string, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
     const Comp = getHtmlTagReplaceReact(el, customReactComponentsForHtmlTags);
-    const finalProps = Object.entries(props).reduce<object>((acc, [key, value]) => {
+    const finalProps = Object.entries(props).reduce<any>((acc, [key, value]) => {
       if (value !== undefined) {
         acc[key] = value;
       }
       return acc;
     }, {});
+    finalProps.key = reactKey;
     if (suppressHydrationWarning) {
       finalProps.suppressHydrationWarning = true;
     }

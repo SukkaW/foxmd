@@ -32,7 +32,7 @@ export function createFoxmdParser(
   const incrementElId = () => {
     elIdList[elIdList.length - 1] += 1;
   };
-  const getReactKey = () => 'foxmd|' + elIdList.join('-');
+  const getReactKey = () => elIdList.join('-');
 
   function parse(tokens: Token[]): FoxmdParserParseResult {
     const tocObj: Array<{
