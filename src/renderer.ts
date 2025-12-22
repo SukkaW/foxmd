@@ -90,7 +90,7 @@ function createInternalFoxmdRenderer(
       return elIdList;
     },
     get elementId() {
-      return getElementId();
+      return this.elIdList.join('-');
     },
     incrementElId() {
       elIdList[elIdList.length - 1] += 1;
