@@ -30,38 +30,28 @@ const knownLangMap = new Map([
 
 export interface FoxmdCustomRendererMethods {
   // protected incrementElId(): void,
-  heading(this: FoxmdActualRenderer, children: ReactNode, level: HeadingLevels, id?: string): ReactNode,
-  paragraph(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
-  link(this: FoxmdActualRenderer, href: string, text: ReactNode, title?: string): ReactNode,
-  image(this: FoxmdActualRenderer, src: string, alt: string, title?: string): ReactNode,
-  codespan(this: FoxmdActualRenderer, code: string, lang?: string | null): ReactNode,
-  code(this: FoxmdActualRenderer, code: string, lang?: string): ReactNode,
-  blockquote(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
-  list(this: FoxmdActualRenderer, children: ReactNode, ordered: boolean, start?: number): ReactNode,
-  listItem(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
-  checkbox(this: FoxmdActualRenderer, checked?: boolean): ReactNode,
-  table(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
-  tableHeader(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
-  tableBody(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
-  tableRow(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
-  tableCell(this: FoxmdActualRenderer, children: ReactNode[], flags: TableFlags): ReactNode,
-  strong(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
-  em(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
-  del(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
-  text(this: FoxmdActualRenderer, text: ReactNode): ReactNode,
-  html(this: FoxmdActualRenderer, html: string): ReactNode | ReactNode[],
-  hr(this: FoxmdActualRenderer): ReactNode,
-  br(this: FoxmdActualRenderer): ReactNode
-}
-
-export interface FoxmdActualRenderer extends FoxmdCustomRendererMethods {
-  readonly elementId: string
-}
-
-interface FoxmdPrivateRenderer extends FoxmdActualRenderer {
-  // private methods or properties can be added here in the future
-  incrementElId(): void,
-  readonly elIdList: number[]
+  heading(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode, level: HeadingLevels, id?: string): ReactNode,
+  paragraph(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
+  link(this: FoxmdCustomRendererMethods, reactKey: string, href: string, text: ReactNode, title?: string): ReactNode,
+  image(this: FoxmdCustomRendererMethods, reactKey: string, src: string, alt: string, title?: string): ReactNode,
+  codespan(this: FoxmdCustomRendererMethods, reactKey: string, code: string, lang?: string | null): ReactNode,
+  code(this: FoxmdCustomRendererMethods, reactKey: string, code: string, lang?: string): ReactNode,
+  blockquote(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
+  list(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode, ordered: boolean, start?: number): ReactNode,
+  listItem(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode[]): ReactNode,
+  checkbox(this: FoxmdCustomRendererMethods, reactKey: string, checked?: boolean): ReactNode,
+  table(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode[]): ReactNode,
+  tableHeader(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
+  tableBody(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode[]): ReactNode,
+  tableRow(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode[]): ReactNode,
+  tableCell(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode[], flags: TableFlags): ReactNode,
+  strong(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
+  em(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
+  del(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
+  text(this: FoxmdCustomRendererMethods, reactKey: string, text: ReactNode): ReactNode,
+  html(this: FoxmdCustomRendererMethods, reactKey: string, html: string): ReactNode | ReactNode[],
+  hr(this: FoxmdCustomRendererMethods, reactKey: string): ReactNode,
+  br(this: FoxmdCustomRendererMethods, reactKey: string): ReactNode
 }
 
 function createInternalFoxmdRenderer(
@@ -69,50 +59,30 @@ function createInternalFoxmdRenderer(
   specialImageSizeInTitleOrAlt: boolean,
   customReactComponentsForHtmlTags: HtmlTagReplaceReact,
   UNSAFE_allowHtml: boolean
-): FoxmdPrivateRenderer {
-  const elIdList: number[] = [];
-
-  function getElementId() {
-    return elIdList.join('-');
-  }
-
-  function h<T extends keyof React.JSX.IntrinsicElements>(el: T, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
-    const elProps = {
-      key: 'foxmd-' + getElementId() + '-' + el,
-      suppressHydrationWarning
-    };
+): FoxmdCustomRendererMethods {
+  function h<T extends keyof React.JSX.IntrinsicElements>(el: T, reactKey: string, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
     const Comp = getHtmlTagReplaceReact(el, customReactComponentsForHtmlTags);
-    return createElement(Comp, { ...props, ...elProps }, children);
+    return createElement(Comp, { ...props, key: reactKey, suppressHydrationWarning }, children);
   }
 
   return {
-    get elIdList() {
-      return elIdList;
-    },
-    get elementId() {
-      return this.elIdList.join('-');
-    },
-    incrementElId() {
-      elIdList[elIdList.length - 1] += 1;
+    heading(reactKey: string, children: ReactNode, level: HeadingLevels, id?: string) {
+      return h(`h${level}`, reactKey, children, { id });
     },
 
-    heading(children: ReactNode, level: HeadingLevels, id?: string) {
-      return h(`h${level}`, children, { id });
+    paragraph(reactKey: string, children: ReactNode) {
+      return h('p', reactKey, children);
     },
 
-    paragraph(children: ReactNode) {
-      return h('p', children);
-    },
-
-    link(href: string, text: ReactNode, title?: string) {
+    link(reactKey: string, href: string, text: ReactNode, title?: string) {
       if (href.startsWith('javascript:') || href.startsWith('data:') || href.startsWith('vbscript:')) {
         href = '';
       }
 
-      return h('a', text, { href, title, target: undefined });
+      return h('a', reactKey, text, { href, title, target: undefined });
     },
 
-    image(src: string, alt: string, title?: string) {
+    image(reactKey: string, src: string, alt: string, title?: string) {
       let width: string | undefined;
       let height: string | undefined;
 
@@ -137,18 +107,22 @@ function createInternalFoxmdRenderer(
         }
       }
 
-      return h('img', null, { src, alt, title, width, height });
+      return h('img', reactKey, null, { src, alt, title, width, height });
     },
 
-    codespan(code: string, lang: string | null = null) {
+    codespan(reactKey: string, code: string, lang: string | null = null) {
       // TODO: add shiki here
       const className = lang ? `language-${lang}` : undefined;
-      return h('code', code, { className });
+      return h('code', reactKey, code, { className });
     },
 
-    code(code: string, lang: string | undefined = '') {
+    code(reactKey: string, code: string, lang: string | undefined = '') {
       return h(
-        'pre', this.codespan(code, lang),
+        'pre', reactKey,
+        this.codespan(
+          reactKey + '-codespan-' + lang,
+          code, lang
+        ),
         {
           // @ts-expect-error -- data attribute
           'data-language': (knownLangMap.has(lang) ? knownLangMap.get(lang)! : lang).toUpperCase()
@@ -156,77 +130,77 @@ function createInternalFoxmdRenderer(
       );
     },
 
-    blockquote(children: ReactNode) {
-      return h('blockquote', children);
+    blockquote(reactKey: string, children: ReactNode) {
+      return h('blockquote', reactKey, children);
     },
 
-    list(children: ReactNode, ordered: boolean, start: number | undefined) {
-      return h(ordered ? 'ol' : 'ul', children, ordered && start !== 1 ? { start } : {});
+    list(reactKey: string, children: ReactNode, ordered: boolean, start: number | undefined) {
+      return h(ordered ? 'ol' : 'ul', reactKey, children, ordered && start !== 1 ? { start } : {});
     },
 
-    listItem(children: ReactNode[]) {
-      return h('li', children);
+    listItem(reactKey: string, children: ReactNode[]) {
+      return h('li', reactKey, children);
     },
 
     // eslint-disable-next-line sukka/bool-param-default -- renderer method
-    checkbox(checked: boolean | undefined) {
-      return h('input', null, {
+    checkbox(reactKey: string, checked: boolean | undefined) {
+      return h('input', reactKey, null, {
         type: 'checkbox',
         disabled: true,
         checked
       });
     },
 
-    table(children: ReactNode[]) {
-      return h('table', children);
+    table(reactKey: string, children: ReactNode[]) {
+      return h('table', reactKey, children);
     },
 
-    tableHeader(children: ReactNode) {
-      return h('thead', children);
+    tableHeader(reactKey: string, children: ReactNode) {
+      return h('thead', reactKey, children);
     },
 
-    tableBody(children: ReactNode[]) {
-      return h('tbody', children);
+    tableBody(reactKey: string, children: ReactNode[]) {
+      return h('tbody', reactKey, children);
     },
 
-    tableRow(children: ReactNode[]) {
-      return h('tr', children);
+    tableRow(reactKey: string, children: ReactNode[]) {
+      return h('tr', reactKey, children);
     },
 
-    tableCell(children: ReactNode[], flags: TableFlags) {
+    tableCell(reactKey: string, children: ReactNode[], flags: TableFlags) {
       const tag = flags.header ? 'th' : 'td';
-      return h(tag, children, { align: flags.align });
+      return h(tag, reactKey, children, { align: flags.align });
     },
 
-    strong(children: ReactNode) {
-      return h('strong', children);
+    strong(reactKey: string, children: ReactNode) {
+      return h('strong', reactKey, children);
     },
 
-    em(children: ReactNode) {
-      return h('em', children);
+    em(reactKey: string, children: ReactNode) {
+      return h('em', reactKey, children);
     },
 
-    del(children: ReactNode) {
-      return h('del', children);
+    del(reactKey: string, children: ReactNode) {
+      return h('del', reactKey, children);
     },
 
     text(text: ReactNode) {
       return text;
     },
 
-    html(html: string): React.ReactNode | React.ReactNode[] {
+    html(reactKey: string, html: string): React.ReactNode | React.ReactNode[] {
       if (UNSAFE_allowHtml) {
-        return htmlToReact(html, getElementId(), customReactComponentsForHtmlTags);
+        return htmlToReact(html, reactKey, customReactComponentsForHtmlTags);
       }
       return html;
     },
 
-    hr() {
-      return h('hr');
+    hr(reactKey: string) {
+      return h('hr', reactKey);
     },
 
-    br() {
-      return h('br');
+    br(reactKey: string) {
+      return h('br', reactKey);
     }
   };
 }

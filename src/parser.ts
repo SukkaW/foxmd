@@ -28,6 +28,12 @@ export function createFoxmdParser(
 ) {
   const headingIds = new Map<string, number>();
 
+  const elIdList: number[] = [];
+  const incrementElId = () => {
+    elIdList[elIdList.length - 1] += 1;
+  };
+  const getReactKey = () => 'foxmd|' + elIdList.join('-');
+
   function parse(tokens: Token[]): FoxmdParserParseResult {
     const tocObj: Array<{
       text: string,
@@ -35,7 +41,7 @@ export function createFoxmdParser(
       level: number
     }> = [];
 
-    renderer.elIdList.push(0);
+    elIdList.push(0);
 
     let inRawBlock = false;
     let bufferedRawBlockToken = '';
@@ -63,8 +69,8 @@ export function createFoxmdParser(
 
           tocObj.push({ text, id, level });
 
-          renderer.incrementElId();
-          return renderer.heading(parseInline(token.tokens).jsx, level, id);
+          incrementElId();
+          return renderer.heading(getReactKey(), parseInline(token.tokens).jsx, level, id);
         }
 
         case 'paragraph': {
@@ -76,8 +82,8 @@ export function createFoxmdParser(
             return parseInline(token.tokens).jsx;
           }
 
-          renderer.incrementElId();
-          return renderer.paragraph(parseInline(token.tokens).jsx);
+          incrementElId();
+          return renderer.paragraph(getReactKey(), parseInline(token.tokens).jsx);
         }
 
         case 'text': {
@@ -94,36 +100,36 @@ export function createFoxmdParser(
           const blockquoteToken = token as Tokens.Blockquote;
           const quote = parse(blockquoteToken.tokens).jsx;
 
-          renderer.incrementElId();
-          return renderer.blockquote(quote);
+          incrementElId();
+          return renderer.blockquote(getReactKey(), quote);
         }
 
         case 'list': {
           const listToken = token as Tokens.List;
 
-          renderer.elIdList.push(0);
+          elIdList.push(0);
           const children = listToken.items.map((item) => {
             const listItemChildren: React.ReactNode[] = [];
 
             if (item.task) {
-              renderer.incrementElId();
-              listItemChildren.push(renderer.checkbox(item.checked ?? false));
+              incrementElId();
+              listItemChildren.push(renderer.checkbox(getReactKey(), item.checked ?? false));
             }
 
             listItemChildren.push(parse(item.tokens).jsx);
 
-            renderer.incrementElId();
-            return renderer.listItem(listItemChildren);
+            incrementElId();
+            return renderer.listItem(getReactKey(), listItemChildren);
           });
-          renderer.elIdList.pop();
+          elIdList.pop();
 
-          renderer.incrementElId();
-          return renderer.list(children, token.ordered, token.ordered ? token.start : undefined);
+          incrementElId();
+          return renderer.list(getReactKey(), children, token.ordered, token.ordered ? token.start : undefined);
         }
 
         case 'code': {
-          renderer.incrementElId();
-          return renderer.code(token.text, token.lang);
+          incrementElId();
+          return renderer.code(getReactKey(), token.text, token.lang);
         }
 
         case 'html': {
@@ -135,8 +141,8 @@ export function createFoxmdParser(
             return null;
           }
 
-          renderer.incrementElId();
-          const node = renderer.html(bufferedRawBlockToken);
+          incrementElId();
+          const node = renderer.html(getReactKey(), bufferedRawBlockToken);
           bufferedRawBlockToken = '';
           return node;
         }
@@ -144,48 +150,48 @@ export function createFoxmdParser(
         case 'table': {
           const tableToken = token as Tokens.Table;
 
-          renderer.elIdList.push(0);
+          elIdList.push(0);
           const headerCells = tableToken.header.map((cell, index) => {
-            renderer.incrementElId();
-            return renderer.tableCell(parseInline(cell.tokens).jsx, {
+            incrementElId();
+            return renderer.tableCell(getReactKey(), parseInline(cell.tokens).jsx, {
               header: true,
               align: token.align[index]
             });
           });
-          renderer.elIdList.pop();
+          elIdList.pop();
 
-          renderer.incrementElId();
-          const headerRow = renderer.tableRow(headerCells);
-          renderer.incrementElId();
-          const header = renderer.tableHeader(headerRow);
+          incrementElId();
+          const headerRow = renderer.tableRow(getReactKey(), headerCells);
+          incrementElId();
+          const header = renderer.tableHeader(getReactKey(), headerRow);
 
-          renderer.elIdList.push(0);
+          elIdList.push(0);
           const bodyChilren = tableToken.rows.map((row) => {
-            renderer.elIdList.push(0);
+            elIdList.push(0);
             const rowChildren = row.map((cell, index) => {
-              renderer.incrementElId();
-              return renderer.tableCell(parseInline(cell.tokens).jsx, {
+              incrementElId();
+              return renderer.tableCell(getReactKey(), parseInline(cell.tokens).jsx, {
                 header: false,
                 align: token.align[index]
               });
             });
-            renderer.elIdList.pop();
+            elIdList.pop();
 
-            renderer.incrementElId();
-            return renderer.tableRow(rowChildren);
+            incrementElId();
+            return renderer.tableRow(getReactKey(), rowChildren);
           });
-          renderer.elIdList.pop();
+          elIdList.pop();
 
-          renderer.incrementElId();
-          const body = renderer.tableBody(bodyChilren);
+          incrementElId();
+          const body = renderer.tableBody(getReactKey(), bodyChilren);
 
-          renderer.incrementElId();
-          return renderer.table([header, body]);
+          incrementElId();
+          return renderer.table(getReactKey(), [header, body]);
         }
 
         case 'hr': {
-          renderer.incrementElId();
-          return renderer.hr();
+          incrementElId();
+          return renderer.hr(getReactKey());
         }
 
         default: {
@@ -195,7 +201,7 @@ export function createFoxmdParser(
         }
       }
     });
-    renderer.elIdList.pop();
+    elIdList.pop();
     return {
       jsx: result,
       toc: tocObj
@@ -203,7 +209,7 @@ export function createFoxmdParser(
   };
 
   function parseInline(tokens: Token[] = []): FoxmdParserParseResult {
-    renderer.elIdList.push(0);
+    elIdList.push(0);
 
     let inRawBlock = false;
     let bufferedRawBlockToken = '';
@@ -216,38 +222,38 @@ export function createFoxmdParser(
             return null;
           }
 
-          renderer.incrementElId();
-          return renderer.text(decode(token.text));
+          incrementElId();
+          return renderer.text(getReactKey(), decode(token.text));
         }
 
         case 'strong': {
-          renderer.incrementElId();
-          return renderer.strong(parseInline(token.tokens).jsx);
+          incrementElId();
+          return renderer.strong(getReactKey(), parseInline(token.tokens).jsx);
         }
 
         case 'em': {
-          renderer.incrementElId();
-          return renderer.em(parseInline(token.tokens).jsx);
+          incrementElId();
+          return renderer.em(getReactKey(), parseInline(token.tokens).jsx);
         }
 
         case 'del': {
-          renderer.incrementElId();
-          return renderer.del(parseInline(token.tokens).jsx);
+          incrementElId();
+          return renderer.del(getReactKey(), parseInline(token.tokens).jsx);
         }
 
         case 'codespan': {
-          renderer.incrementElId();
-          return renderer.codespan(decode(token.text));
+          incrementElId();
+          return renderer.codespan(getReactKey(), decode(token.text));
         }
 
         case 'link': {
-          renderer.incrementElId();
-          return renderer.link(token.href, parseInline(token.tokens).jsx, token.title ?? undefined);
+          incrementElId();
+          return renderer.link(getReactKey(), token.href, parseInline(token.tokens).jsx, token.title ?? undefined);
         }
 
         case 'image': {
-          renderer.incrementElId();
-          return renderer.image(token.href, token.text, token.title);
+          incrementElId();
+          return renderer.image(getReactKey(), token.href, token.text, token.title);
         }
 
         case 'html': {
@@ -259,20 +265,20 @@ export function createFoxmdParser(
             return null;
           }
 
-          renderer.incrementElId();
-          const node = renderer.html(bufferedRawBlockToken);
+          incrementElId();
+          const node = renderer.html(getReactKey(), bufferedRawBlockToken);
           bufferedRawBlockToken = '';
           return node;
         }
 
         case 'br': {
-          renderer.incrementElId();
-          return renderer.br();
+          incrementElId();
+          return renderer.br(getReactKey());
         }
 
         case 'escape': {
-          renderer.incrementElId();
-          return renderer.text(token.text);
+          incrementElId();
+          return renderer.text(getReactKey(), token.text);
         }
 
         default: {
@@ -282,7 +288,7 @@ export function createFoxmdParser(
         }
       }
     });
-    renderer.elIdList.pop();
+    elIdList.pop();
     return {
       jsx: result,
       toc: [] as never[]
