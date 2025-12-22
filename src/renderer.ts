@@ -62,7 +62,7 @@ function createInternalFoxmdRenderer(
 ): FoxmdCustomRendererMethods {
   function h<T extends keyof React.JSX.IntrinsicElements>(el: T, reactKey: string, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
     const Comp = getHtmlTagReplaceReact(el, customReactComponentsForHtmlTags);
-    return createElement(Comp, { ...props, key: reactKey, suppressHydrationWarning }, children);
+    return createElement(Comp, { ...props, key: reactKey, suppressHydrationWarning: suppressHydrationWarning ? true : undefined }, children);
   }
 
   return {
