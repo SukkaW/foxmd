@@ -48,7 +48,7 @@ export interface FoxmdCustomRendererMethods {
   strong(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
   em(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
   del(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
-  text(this: FoxmdCustomRendererMethods, reactKey: string, text: ReactNode): ReactNode,
+  text(this: FoxmdCustomRendererMethods, text: ReactNode): ReactNode,
   html(this: FoxmdCustomRendererMethods, reactKey: string, html: string): ReactNode | ReactNode[],
   hr(this: FoxmdCustomRendererMethods, reactKey: string): ReactNode,
   br(this: FoxmdCustomRendererMethods, reactKey: string): ReactNode

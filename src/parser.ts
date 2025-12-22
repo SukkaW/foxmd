@@ -223,7 +223,7 @@ export function createFoxmdParser(
           }
 
           incrementElId();
-          return renderer.text(getReactKey(), decode(token.text));
+          return renderer.text(decode(token.text));
         }
 
         case 'strong': {
@@ -278,7 +278,7 @@ export function createFoxmdParser(
 
         case 'escape': {
           incrementElId();
-          return renderer.text(getReactKey(), token.text);
+          return renderer.text(token.text);
         }
 
         default: {
