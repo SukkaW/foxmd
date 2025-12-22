@@ -62,7 +62,16 @@ function createInternalFoxmdRenderer(
 ): FoxmdCustomRendererMethods {
   function h<T extends keyof React.JSX.IntrinsicElements>(el: T, reactKey: string, children: ReactNode = null, props: React.JSX.IntrinsicElements[T] = {}): ReactNode {
     const Comp = getHtmlTagReplaceReact(el, customReactComponentsForHtmlTags);
-    return createElement(Comp, { ...props, key: reactKey, suppressHydrationWarning: suppressHydrationWarning ? true : undefined }, children);
+    const finalProps = Object.entries(props).reduce<object>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+    if (suppressHydrationWarning) {
+      finalProps.suppressHydrationWarning = true;
+    }
+    return createElement(Comp, finalProps, children);
   }
 
   return {
@@ -79,7 +88,7 @@ function createInternalFoxmdRenderer(
         href = '';
       }
 
-      return h('a', reactKey, text, { href, title, target: undefined });
+      return h('a', reactKey, text, { href, title /* , target: undefined */ });
     },
 
     image(reactKey: string, src: string, alt: string, title?: string) {
