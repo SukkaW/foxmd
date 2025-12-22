@@ -10,11 +10,9 @@ export interface TableFlags {
   align?: 'center' | 'left' | 'right' | undefined
 }
 
-export type CustomRendererMethods = Partial<Omit<FoxmdRenderer, 'elIdList' | 'elementId' | 'incrementElId'>>;
-
 export interface FoxmdRendererOptions {
   suppressHydrationWarning?: boolean,
-  customRenderMethods?: CustomRendererMethods,
+  customRenderMethods?: Partial<FoxmdCustomRendererMethods>,
   customReactComponentsForHtmlTags?: HtmlTagReplaceReact,
   specialImageSizeInTitleOrAlt?: boolean,
   UNSAFE_allowHtml?: boolean
@@ -30,12 +28,48 @@ const knownLangMap = new Map([
   ['yml', 'yaml']
 ]);
 
+export interface FoxmdCustomRendererMethods {
+  // protected incrementElId(): void,
+  heading(this: FoxmdActualRenderer, children: ReactNode, level: HeadingLevels, id?: string): ReactNode,
+  paragraph(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
+  link(this: FoxmdActualRenderer, href: string, text: ReactNode, title?: string): ReactNode,
+  image(this: FoxmdActualRenderer, src: string, alt: string, title?: string): ReactNode,
+  codespan(this: FoxmdActualRenderer, code: string, lang?: string | null): ReactNode,
+  code(this: FoxmdActualRenderer, code: string, lang?: string): ReactNode,
+  blockquote(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
+  list(this: FoxmdActualRenderer, children: ReactNode, ordered: boolean, start?: number): ReactNode,
+  listItem(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
+  checkbox(this: FoxmdActualRenderer, checked?: boolean): ReactNode,
+  table(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
+  tableHeader(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
+  tableBody(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
+  tableRow(this: FoxmdActualRenderer, children: ReactNode[]): ReactNode,
+  tableCell(this: FoxmdActualRenderer, children: ReactNode[], flags: TableFlags): ReactNode,
+  strong(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
+  em(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
+  del(this: FoxmdActualRenderer, children: ReactNode): ReactNode,
+  text(this: FoxmdActualRenderer, text: ReactNode): ReactNode,
+  html(this: FoxmdActualRenderer, html: string): ReactNode | ReactNode[],
+  hr(this: FoxmdActualRenderer): ReactNode,
+  br(this: FoxmdActualRenderer): ReactNode
+}
+
+export interface FoxmdActualRenderer extends FoxmdCustomRendererMethods {
+  readonly elementId: string
+}
+
+interface FoxmdPrivateRenderer extends FoxmdActualRenderer {
+  // private methods or properties can be added here in the future
+  incrementElId(): void,
+  readonly elIdList: number[]
+}
+
 function createInternalFoxmdRenderer(
   suppressHydrationWarning: boolean,
   specialImageSizeInTitleOrAlt: boolean,
   customReactComponentsForHtmlTags: HtmlTagReplaceReact,
   UNSAFE_allowHtml: boolean
-) {
+): FoxmdPrivateRenderer {
   const elIdList: number[] = [];
 
   function getElementId() {
