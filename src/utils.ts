@@ -23,6 +23,9 @@ const rControl = /[\u0000-\u001F]/g;
 const rSpecial = /[\s!"#$%&'()*+,./:;<=>?@[\\\]^_`{|}~-]+/g;
 
 import { escapeRegexp as escapeRegExp } from 'fast-escape-regexp';
+import { never } from 'foxts/guard';
+import { decode } from 'html-entities';
+import type { MarkedToken } from 'marked';
 
 export function slugize(str: string) {
   if (typeof str !== 'string') throw new TypeError('str must be a string!');
@@ -146,4 +149,56 @@ function escapeDiacritic(str: string) {
   // http://stackoverflow.com/a/18391901
   // eslint-disable-next-line no-control-regex -- escaping
   return str.replaceAll(/[^\u0000-\u007E]/g, a => diacriticsMap[a] || a);
+}
+
+// ----------
+
+export function tokensToText(tokens: MarkedToken[], skipCodeBlock: boolean): string {
+  let result = '';
+  for (let i = 0, len = tokens.length; i < len; i++) {
+    result += getToken(tokens[i], skipCodeBlock);
+  }
+  return result;
+}
+
+export function getToken(token: MarkedToken, skipCodeBlock: boolean): string {
+  switch (token.type) {
+    case 'heading':
+    case 'paragraph':
+    case 'blockquote':
+    case 'link':
+    case 'list_item':
+      return tokensToText(token.tokens as MarkedToken[], skipCodeBlock) + '\n';
+    case 'text':
+    case 'em':
+    case 'strong':
+    case 'codespan':
+    case 'del':
+    case 'escape':
+      return decode(token.text);
+    case 'code':
+      if (skipCodeBlock) {
+        return '';
+      }
+      return decode(token.text) + '\n';
+    case 'br':
+    case 'hr':
+    case 'html':
+    case 'image':
+    case 'table':
+    case 'def':
+      return '\n';
+    case 'space':
+      return ' ';
+    case 'list': {
+      let listText = '';
+      for (let j = 0, listLen = token.items.length; j < listLen; j++) {
+        const item = token.items[j];
+        listText += tokensToText(item.tokens as MarkedToken[], skipCodeBlock) + '\n';
+      }
+      return listText;
+    }
+    default:
+      never(token, 'marked token');
+  }
 }

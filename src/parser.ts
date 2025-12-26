@@ -1,10 +1,9 @@
-import type { MarkedToken, Token } from 'marked';
+import type { MarkedToken } from 'marked';
 
 import type { HeadingLevels } from './renderer';
 import type { FoxmdRenderer } from './renderer';
 import { decode } from 'html-entities';
-import { fastStringArrayJoin } from 'foxts/fast-string-array-join';
-import { slugize } from './utils';
+import { slugize, tokensToText } from './utils';
 import type React from 'react';
 
 export interface FoxmdParserParseResult {
@@ -54,7 +53,7 @@ export function createFoxmdParser(
 
         case 'heading': {
           const level = token.depth as HeadingLevels;
-          const text = getText(token.tokens);
+          const text = tokensToText(token.tokens as MarkedToken[], true);
           let id = slugize(text);
 
           let headingIndex = 1;
@@ -299,41 +298,4 @@ export function createFoxmdParser(
     parse,
     parseInline
   };
-}
-
-function getText(tokens: Token[] = []): string {
-  return fastStringArrayJoin(tokens.map((token) => {
-    switch (token.type) {
-      case 'text':
-      case 'codespan':
-      {
-        return decode(token.text);
-      }
-
-      case 'strong':
-      case 'em':
-      case 'del':
-      case 'link':
-      {
-        return getText(token.tokens);
-      }
-
-      case 'image': {
-        return '';
-      }
-
-      case 'html':
-      case 'br':
-      case 'escape':
-      {
-        return '';
-      }
-
-      default: {
-        // eslint-disable-next-line no-console -- dev warning
-        console.warn(`[foxmd] Token with "${token.type}" type was not found`);
-        return '';
-      }
-    }
-  }), '-');
 }
