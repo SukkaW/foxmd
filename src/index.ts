@@ -58,6 +58,6 @@ export function markdownToText(markdownString: string, {
   markedInstance = defaultMarkedInstance() as Marked,
   lexerOptions = getDefaultMarkedLexerOptions(markedInstance),
   skipCodeBlock = false
-}: MarkdownToTextOptions): string {
+}: MarkdownToTextOptions = {}): string {
   return tokensToText(markedInstance.lexer(markdownString, lexerOptions) as MarkedToken[], skipCodeBlock);
 }
