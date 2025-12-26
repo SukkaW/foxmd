@@ -7,7 +7,7 @@ import type { HtmlTagReplaceReact } from './utils';
 export type HeadingLevels = 1 | 2 | 3 | 4 | 5 | 6;
 export interface TableFlags {
   header?: boolean,
-  align?: 'center' | 'left' | 'right' | undefined
+  align?: 'center' | 'left' | 'right' | undefined | null
 }
 
 export interface FoxmdRendererOptions {
@@ -33,11 +33,11 @@ export interface FoxmdCustomRendererMethods {
   heading(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode, level: HeadingLevels, id?: string): ReactNode,
   paragraph(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
   link(this: FoxmdCustomRendererMethods, reactKey: string, href: string, text: ReactNode, title?: string): ReactNode,
-  image(this: FoxmdCustomRendererMethods, reactKey: string, src: string, alt: string, title?: string): ReactNode,
+  image(this: FoxmdCustomRendererMethods, reactKey: string, src: string, alt: string, title?: string | null): ReactNode,
   codespan(this: FoxmdCustomRendererMethods, reactKey: string, code: string, lang?: string | null): ReactNode,
   code(this: FoxmdCustomRendererMethods, reactKey: string, code: string, lang?: string): ReactNode,
   blockquote(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode): ReactNode,
-  list(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode, ordered: boolean, start?: number): ReactNode,
+  list(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode, ordered: boolean, start?: number | string | null): ReactNode,
   listItem(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode[]): ReactNode,
   checkbox(this: FoxmdCustomRendererMethods, reactKey: string, checked?: boolean): ReactNode,
   table(this: FoxmdCustomRendererMethods, reactKey: string, children: ReactNode[]): ReactNode,
@@ -179,7 +179,7 @@ function createInternalFoxmdRenderer(
 
     tableCell(reactKey: string, children: ReactNode[], flags: TableFlags) {
       const tag = flags.header ? 'th' : 'td';
-      return h(tag, reactKey, children, { align: flags.align });
+      return h(tag, reactKey, children, { align: flags.align || undefined });
     },
 
     strong(reactKey: string, children: ReactNode) {

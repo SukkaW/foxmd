@@ -1,4 +1,4 @@
-import type { Token, Tokens } from 'marked';
+import type { MarkedToken, Token } from 'marked';
 
 import type { HeadingLevels } from './renderer';
 import type { FoxmdRenderer } from './renderer';
@@ -34,7 +34,7 @@ export function createFoxmdParser(
   };
   const getReactKey = () => elIdList.join('-');
 
-  function parse(tokens: Token[]): FoxmdParserParseResult {
+  function parse(tokens: MarkedToken[]): FoxmdParserParseResult {
     const tocObj: Array<{
       text: string,
       id: string,
@@ -49,7 +49,7 @@ export function createFoxmdParser(
     const result = tokens.map<React.ReactNode>((token): React.ReactNode => {
       switch (token.type) {
         case 'space': {
-          return null;
+          return ' ';
         }
 
         case 'heading': {
@@ -70,7 +70,7 @@ export function createFoxmdParser(
           tocObj.push({ text, id, level });
 
           incrementElId();
-          return renderer.heading(getReactKey(), parseInline(token.tokens).jsx, level, id);
+          return renderer.heading(getReactKey(), parseInline(token.tokens as MarkedToken[]).jsx, level, id);
         }
 
         case 'paragraph': {
@@ -79,33 +79,33 @@ export function createFoxmdParser(
             && token.tokens?.length === 1
             && token.tokens[0].type === 'image'
           ) {
-            return parseInline(token.tokens).jsx;
+            return parseInline(token.tokens as MarkedToken[]).jsx;
           }
 
           incrementElId();
-          return renderer.paragraph(getReactKey(), parseInline(token.tokens).jsx);
+          return renderer.paragraph(getReactKey(), parseInline(token.tokens as MarkedToken[]).jsx);
         }
 
         case 'text': {
-          const textToken = token as Tokens.Text;
+          const textToken = token;
           if (inRawBlock) {
             bufferedRawBlockToken += token.text;
             return null;
           }
 
-          return textToken.tokens ? parseInline(textToken.tokens).jsx : token.text;
+          return textToken.tokens ? parseInline(textToken.tokens as MarkedToken[]).jsx : token.text;
         }
 
         case 'blockquote': {
-          const blockquoteToken = token as Tokens.Blockquote;
-          const quote = parse(blockquoteToken.tokens).jsx;
+          const blockquoteToken = token;
+          const quote = parse(blockquoteToken.tokens as MarkedToken[]).jsx;
 
           incrementElId();
           return renderer.blockquote(getReactKey(), quote);
         }
 
         case 'list': {
-          const listToken = token as Tokens.List;
+          const listToken = token;
 
           elIdList.push(0);
           const children = listToken.items.map((item) => {
@@ -116,7 +116,7 @@ export function createFoxmdParser(
               listItemChildren.push(renderer.checkbox(getReactKey(), item.checked ?? false));
             }
 
-            listItemChildren.push(parse(item.tokens).jsx);
+            listItemChildren.push(parse(item.tokens as MarkedToken[]).jsx);
 
             incrementElId();
             return renderer.listItem(getReactKey(), listItemChildren);
@@ -124,7 +124,7 @@ export function createFoxmdParser(
           elIdList.pop();
 
           incrementElId();
-          return renderer.list(getReactKey(), children, token.ordered, token.ordered ? token.start : undefined);
+          return renderer.list(getReactKey(), children, token.ordered, token.ordered ? token.start : null);
         }
 
         case 'code': {
@@ -148,12 +148,12 @@ export function createFoxmdParser(
         }
 
         case 'table': {
-          const tableToken = token as Tokens.Table;
+          const tableToken = token;
 
           elIdList.push(0);
           const headerCells = tableToken.header.map((cell, index) => {
             incrementElId();
-            return renderer.tableCell(getReactKey(), parseInline(cell.tokens).jsx, {
+            return renderer.tableCell(getReactKey(), parseInline(cell.tokens as MarkedToken[]).jsx, {
               header: true,
               align: token.align[index]
             });
@@ -170,7 +170,7 @@ export function createFoxmdParser(
             elIdList.push(0);
             const rowChildren = row.map((cell, index) => {
               incrementElId();
-              return renderer.tableCell(getReactKey(), parseInline(cell.tokens).jsx, {
+              return renderer.tableCell(getReactKey(), parseInline(cell.tokens as MarkedToken[]).jsx, {
                 header: false,
                 align: token.align[index]
               });
@@ -208,7 +208,7 @@ export function createFoxmdParser(
     };
   };
 
-  function parseInline(tokens: Token[] = []): FoxmdParserParseResult {
+  function parseInline(tokens: MarkedToken[] = []): FoxmdParserParseResult {
     elIdList.push(0);
 
     let inRawBlock = false;
@@ -228,17 +228,17 @@ export function createFoxmdParser(
 
         case 'strong': {
           incrementElId();
-          return renderer.strong(getReactKey(), parseInline(token.tokens).jsx);
+          return renderer.strong(getReactKey(), parseInline(token.tokens as MarkedToken[]).jsx);
         }
 
         case 'em': {
           incrementElId();
-          return renderer.em(getReactKey(), parseInline(token.tokens).jsx);
+          return renderer.em(getReactKey(), parseInline(token.tokens as MarkedToken[]).jsx);
         }
 
         case 'del': {
           incrementElId();
-          return renderer.del(getReactKey(), parseInline(token.tokens).jsx);
+          return renderer.del(getReactKey(), parseInline(token.tokens as MarkedToken[]).jsx);
         }
 
         case 'codespan': {
@@ -248,7 +248,7 @@ export function createFoxmdParser(
 
         case 'link': {
           incrementElId();
-          return renderer.link(getReactKey(), token.href, parseInline(token.tokens).jsx, token.title ?? undefined);
+          return renderer.link(getReactKey(), token.href, parseInline(token.tokens as MarkedToken[]).jsx, token.title ?? undefined);
         }
 
         case 'image': {
