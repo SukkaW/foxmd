@@ -163,13 +163,18 @@ export function tokensToText(tokens: MarkedToken[], skipCodeBlock: boolean): str
 
 export function getToken(token: MarkedToken, skipCodeBlock: boolean): string {
   switch (token.type) {
+    case 'text':
+      if (token.tokens) {
+        return tokensToText(token.tokens as MarkedToken[], skipCodeBlock);
+      }
+      return decode(token.text);
     case 'heading':
     case 'paragraph':
     case 'blockquote':
+      return tokensToText(token.tokens as MarkedToken[], skipCodeBlock) + '\n';
     case 'link':
     case 'list_item':
-      return tokensToText(token.tokens as MarkedToken[], skipCodeBlock) + '\n';
-    case 'text':
+      return tokensToText(token.tokens as MarkedToken[], skipCodeBlock);
     case 'em':
     case 'strong':
     case 'codespan':
@@ -189,7 +194,7 @@ export function getToken(token: MarkedToken, skipCodeBlock: boolean): string {
     case 'def':
       return '\n';
     case 'space':
-      return ' ';
+      return token.raw;
     case 'list': {
       let listText = '';
       for (let j = 0, listLen = token.items.length; j < listLen; j++) {

@@ -86,13 +86,12 @@ export function createFoxmdParser(
         }
 
         case 'text': {
-          const textToken = token;
           if (inRawBlock) {
             bufferedRawBlockToken += token.text;
             return null;
           }
 
-          return textToken.tokens ? parseInline(textToken.tokens as MarkedToken[]).jsx : token.text;
+          return token.tokens ? parseInline(token.tokens as MarkedToken[]).jsx : decode(token.text);
         }
 
         case 'blockquote': {
