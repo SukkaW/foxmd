@@ -29,9 +29,9 @@ importers:
       marked:
         specifier: ^15.0.12
         version: 15.0.12
-      server-only:
-        specifier: ^0.0.1
-        version: 0.0.1
+      react:
+        specifier: '*'
+        version: 19.2.3
       style-to-object:
         specifier: ^1.0.14
         version: 1.0.14
@@ -43,8 +43,8 @@ importers:
         specifier: ^10.3.2
         version: 10.3.2
       bunchee:
-        specifier: ^6.6.2
-        version: 6.6.2(typescript@5.9.3)
+        specifier: ^6.8.0
+        version: 6.8.0(typescript@5.9.3)
       eslint:
         specifier: ^9.39.2
         version: 9.39.2(jiti@2.6.1)
@@ -295,8 +295,8 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@rollup/plugin-commonjs@28.0.9':
-    resolution: {integrity: sha512-PIR4/OHZ79romx0BVVll/PkwWpJ7e5lsqFa3gFfcrFPWwLXLV39JVUzQV9RKjWerE7B845Hqjj9VYlQeieZ2dA==}
+  '@rollup/plugin-commonjs@29.0.0':
+    resolution: {integrity: sha512-U2YHaxR2cU/yAiwKJtJRhnyLk7cifnQw0zUpISsocBDoHDJn+HTV74ABqnwr5bEgWUwFZC9oFL6wLe21lHu5eQ==}
     engines: {node: '>=16.0.0 || 14 >= 14.17'}
     peerDependencies:
       rollup: ^2.68.0||^3.0.0||^4.0.0
@@ -590,10 +590,6 @@ packages:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <6.0.0'
 
-  '@typescript-eslint/types@8.48.0':
-    resolution: {integrity: sha512-cQMcGQQH7kwKoVswD1xdOytxQR60MWKM1di26xSUtxehaDs/32Zpqsu5WJlXTtTTqyAVK8R7hvsUnIXRS+bjvA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@typescript-eslint/types@8.50.0':
     resolution: {integrity: sha512-iX1mgmGrXdANhhITbpp2QQM2fGehBse9LbTf0sidWK6yg/NE+uhV5dfU1g6EYPlcReYmkE9QLPq/2irKAmtS9w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -762,13 +758,16 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  bunchee@6.6.2:
-    resolution: {integrity: sha512-hf9B4X/2jgFl0hYhE1NT/mnhnxEBxDNfiZnhtAVMWSUPIAtPLqcoLXUZYsmRhureNGcsowQI8a22e8kQ9Un/AA==}
+  bunchee@6.8.0:
+    resolution: {integrity: sha512-FKy9k7zWuluTsauADBv9iyyGPIYrWUCaP8Y0Vx2blgVL6bl/HRwEMEMiXFQSuk3TZF2CIGotv4+/mXQFwfSaAw==}
     engines: {node: '>= 18.0.0'}
     hasBin: true
     peerDependencies:
+      '@typescript/native-preview': '*'
       typescript: ^4.1 || ^5.0
     peerDependenciesMeta:
+      '@typescript/native-preview':
+        optional: true
       typescript:
         optional: true
 
@@ -1356,6 +1355,10 @@ packages:
   rc9@2.1.2:
     resolution: {integrity: sha512-btXCnMmRIBINM2LDZoEmOogIZU7Qe7zn4BpomSKZ/ykbLObuBdvG+mFq11DL6fjH1DRwHhrlgtYWG96bJiC7Cg==}
 
+  react@19.2.3:
+    resolution: {integrity: sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA==}
+    engines: {node: '>=0.10.0'}
+
   readdirp@4.1.2:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
@@ -1416,9 +1419,6 @@ packages:
     resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
     engines: {node: '>=10'}
     hasBin: true
-
-  server-only@0.0.1:
-    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
 
   shebang-command@2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
@@ -1754,7 +1754,7 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@rollup/plugin-commonjs@28.0.9(rollup@4.53.3)':
+  '@rollup/plugin-commonjs@29.0.0(rollup@4.53.3)':
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
       commondir: 1.0.1
@@ -1999,8 +1999,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/types@8.48.0': {}
-
   '@typescript-eslint/types@8.50.0': {}
 
   '@typescript-eslint/typescript-estree@8.50.0(typescript@5.9.3)':
@@ -2149,9 +2147,9 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  bunchee@6.6.2(typescript@5.9.3):
+  bunchee@6.8.0(typescript@5.9.3):
     dependencies:
-      '@rollup/plugin-commonjs': 28.0.9(rollup@4.53.3)
+      '@rollup/plugin-commonjs': 29.0.0(rollup@4.53.3)
       '@rollup/plugin-json': 6.1.0(rollup@4.53.3)
       '@rollup/plugin-node-resolve': 16.0.3(rollup@4.53.3)
       '@rollup/plugin-replace': 6.0.3(rollup@4.53.3)
@@ -2373,7 +2371,7 @@ snapshots:
 
   eslint-plugin-import-x@4.16.1(@typescript-eslint/utils@8.50.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
-      '@typescript-eslint/types': 8.48.0
+      '@typescript-eslint/types': 8.50.0
       comment-parser: 1.4.1
       debug: 4.4.3
       eslint: 9.39.2(jiti@2.6.1)
@@ -2792,6 +2790,8 @@ snapshots:
       defu: 6.1.4
       destr: 2.0.5
 
+  react@19.2.3: {}
+
   readdirp@4.1.2: {}
 
   refa@0.12.1:
@@ -2872,8 +2872,6 @@ snapshots:
       regexp-ast-analysis: 0.7.1
 
   semver@7.7.3: {}
-
-  server-only@0.0.1: {}
 
   shebang-command@2.0.0:
     dependencies:

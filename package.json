@@ -44,13 +44,12 @@
     "html-entities": "^2.6.0",
     "htmlparser2": "^10.0.0",
     "marked": "^15.0.12",
-    "server-only": "^0.0.1",
     "style-to-object": "^1.0.14"
   },
   "devDependencies": {
     "@types/react": "^19.2.7",
     "bumpp": "^10.3.2",
-    "bunchee": "^6.6.2",
+    "bunchee": "^6.8.0",
     "eslint": "^9.39.2",
     "eslint-config-sukka": "^8.0.6",
     "eslint-formatter-sukka": "^8.0.6",
@@ -58,9 +57,10 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@types/react": "*"
+    "@types/react": "*",
+    "react": "*"
   },
-  "packageManager": "pnpm@10.26.1",
+  "packageManager": "pnpm@10.26.2",
   "pnpm": {
     "overrides": {
       "eslint>chalk": "npm:ansis@3.17.0"

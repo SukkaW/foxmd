@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { lazyValue } from 'foxts/lazy-value';
 import type { MarkedOptions, MarkedToken } from 'marked';
 import { Marked } from 'marked';
