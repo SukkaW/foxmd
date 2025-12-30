@@ -4,7 +4,8 @@ import type React from 'react';
 import { isDocument } from 'domhandler';
 import type { Element, Document } from 'domhandler';
 
-import styleToObject from 'style-to-object';
+import { parse as postcssParse } from 'postcss';
+import { objectify as postcssObjectify } from 'postcss-js';
 
 import possibleStandardNames from './react-dom-possible-standard-names';
 import { htmlBooleanAttributes, htmlOverloadedBooleanAttributes } from './react-dom-boolean-proeprty';
@@ -58,7 +59,7 @@ export function domNodeToReactNode(node: Element | Document, children: React.Rea
         }
 
         if (key === 'style') {
-          props.style = styleToObject(value);
+          props.style = postcssObjectify(postcssParse(value), { stringifyImportant: true });
           continue;
         }
 

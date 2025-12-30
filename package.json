@@ -44,9 +44,11 @@
     "html-entities": "^2.6.0",
     "htmlparser2": "^10.0.0",
     "marked": "^15.0.12",
-    "style-to-object": "^1.0.14"
+    "postcss": "^8.5.6",
+    "postcss-js": "^5.0.3"
   },
   "devDependencies": {
+    "@types/postcss-js": "^4.1.0",
     "@types/react": "^19.2.7",
     "bumpp": "^10.3.2",
     "bunchee": "^6.8.0",
