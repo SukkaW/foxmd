@@ -51,7 +51,7 @@
     "@types/postcss-js": "^4.1.0",
     "@types/react": "^19.2.7",
     "bumpp": "^10.3.2",
-    "bunchee": "^6.8.0",
+    "bunchee": "^6.9.3",
     "eslint": "^9.39.2",
     "eslint-config-sukka": "^8.0.6",
     "eslint-formatter-sukka": "^8.0.6",
