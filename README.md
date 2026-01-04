@@ -130,7 +130,7 @@ export default async function MarkdownComponent({ slug }: MarkdownComponentProps
 
   // Note that the `toc` is a flat array of headings, with their level, id (already slugified) and text content.
   // Most likely, you will want to convert this flat array into a tree structure.
-  // Currently, foxmd does export such a utility `tocArrayToTree`, but you can always bring your own implementation if you wish.
+  // Currently, foxmd does export an opinionated utility `tocArrayToTree`, but you can always write your own transformation if you wish.
   console.log({ tocTree: tocArrayToTree(toc) });
 
   return (
