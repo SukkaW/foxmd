@@ -1,6 +1,6 @@
 # foxmd
 
-An opinionated Markdown to React transformer for React Server Components.
+An opinionated library that can turn Markdown string into `React.ReactNode[]`.
 
 ## Why foxmd?
 
