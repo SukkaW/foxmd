@@ -53,7 +53,7 @@ pnpm add foxmd
 **Turn Markdown string into React elements**
 
 ```tsx
-import { foxmd } from 'foxmd';
+import { foxmd, tocArrayToTree } from 'foxmd';
 import Link from 'next/link';
 
 export interface MarkdownComponentProps {
@@ -128,10 +128,10 @@ export default async function MarkdownComponent({ slug }: MarkdownComponentProps
     }
   });
 
-  // Note that the toc is a flat array of headings, with their level and text content.
+  // Note that the `toc` is a flat array of headings, with their level, id (already slugified) and text content.
   // Most likely, you will want to convert this flat array into a tree structure.
-  // Currently, foxmd does not provide such utilities, but in the future, it may provide one, and as always, PR is welcome.
-  console.log({ toc });
+  // Currently, foxmd does export such a utility `tocArrayToTree`, but you can always bring your own implementation if you wish.
+  console.log({ tocTree: tocArrayToTree(toc) });
 
   return (
     <div>

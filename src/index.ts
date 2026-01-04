@@ -79,3 +79,82 @@ export function markdownToText(markdownString: string | Token[], {
 
   return tokensToText(tokens, skipCodeBlock);
 }
+
+export type ToCTree = {
+  id?: string,
+  index?: string,
+  text?: string
+} & {
+  [key: string]: ToCTree
+};
+
+/**
+ * Example
+ *
+ * {
+ *    "1": {
+ *        "id": "foxmd-is-an-opinionated-library-that-can-turn-Markdown-string-into-React-ReactNodes",
+ *        "index": "1"
+ *    },
+ *    "2": {
+ *        "1": {
+ *            "1": {
+ *                "id": "Third-level-title",
+ *                "index": "2.1.1"
+ *            },
+ *            "id": "Second-level-title",
+ *            "index": "2.1"
+ *        },
+ *        "2": {
+ *            "id": "Another-second-level-title",
+ *            "index": "2.2"
+ *        },
+ *        "id": "First-level-title",
+ *        "index": "2"
+ *    }
+ * }
+ */
+export function tocArrayToTree(tocArray: Array<{
+  text: string,
+  id: string,
+  level: number
+}>): ToCTree {
+  const tree: ToCTree = {};
+
+  const levels = [0, 0, 0, 0, 0, 0];
+
+  const minLevel = Math.min(...tocArray.map(item => item.level));
+
+  for (let i = 0, len = tocArray.length; i < len; i++) {
+    const item = tocArray[i];
+    const { text, id } = item;
+    const level = item.level - minLevel;
+
+    for (let j = 0; j < 6; j++) {
+      if (j > level) {
+        levels[j] = 0;
+      } else if (j < level) {
+        if (levels[j] === 0) {
+          // if headings start with a lower level heading, set the former heading index to 1
+          // e.g. h3, h2, h1, h2, h3 => 1.1.1, 1.2, 2, 2.1, 2.1.1
+          levels[j] = 1;
+        }
+      } else {
+        levels[j] += 1;
+      }
+    }
+
+    let node: ToCTree = tree;
+    const $levels = levels.slice(0, level + 1);
+    for (let k = 0, len = $levels.length; k < len; k++) {
+      const item = $levels[k];
+      if (!(item in node)) node[item] = {};
+      node = node[item];
+    }
+    node.id = id;
+    node.text = text;
+    node.index = $levels.join('.');
+  }
+
+  return tree;
+}
