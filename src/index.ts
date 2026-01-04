@@ -90,7 +90,7 @@ export type ToCTree = {
 
 /**
  * Example
- *
+ * ```js
  * {
  *    "1": {
  *        "id": "foxmd-is-an-opinionated-library-that-can-turn-Markdown-string-into-React-ReactNodes",
@@ -113,6 +113,7 @@ export type ToCTree = {
  *        "index": "2"
  *    }
  * }
+ * ```
  */
 export function tocArrayToTree(tocArray: Array<{
   text: string,
