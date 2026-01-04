@@ -1,5 +1,5 @@
 import { lazyValue } from 'foxts/lazy-value';
-import type { MarkedOptions, MarkedToken } from 'marked';
+import type { MarkedOptions, MarkedToken, Token } from 'marked';
 import { Marked } from 'marked';
 import { createFoxmdRenderer } from './renderer';
 import type { FoxmdRendererOptions } from './renderer';
@@ -22,7 +22,7 @@ export interface FoxmdOptions {
 }
 
 export function foxmd(
-  markdownString: string,
+  markdownString: string | Token[],
   {
     foxmdRendererOptions,
     foxmdParserOptions,
@@ -31,7 +31,12 @@ export function foxmd(
     isInline = false
   }: FoxmdOptions = {}
 ) {
-  const tokens = markedInstance.lexer(markdownString, lexerOptions) as MarkedToken[];
+  let tokens: MarkedToken[];
+  if (typeof markdownString === 'string') {
+    tokens = markedInstance.lexer(markdownString, lexerOptions) as MarkedToken[];
+  } else {
+    tokens = markdownString as MarkedToken[];
+  }
 
   const parser = createFoxmdParser(createFoxmdRenderer(foxmdRendererOptions), foxmdParserOptions);
 
@@ -52,10 +57,17 @@ export interface MarkdownToTextOptions {
   skipCodeBlock?: boolean
 }
 
-export function markdownToText(markdownString: string, {
+export function markdownToText(markdownString: string | Token[], {
   markedInstance = defaultMarkedInstance() as Marked,
   lexerOptions = getDefaultMarkedLexerOptions(markedInstance),
   skipCodeBlock = false
 }: MarkdownToTextOptions = {}): string {
-  return tokensToText(markedInstance.lexer(markdownString, lexerOptions) as MarkedToken[], skipCodeBlock);
+  let tokens: MarkedToken[];
+  if (typeof markdownString === 'string') {
+    tokens = markedInstance.lexer(markdownString, lexerOptions) as MarkedToken[];
+  } else {
+    tokens = markdownString as MarkedToken[];
+  }
+
+  return tokensToText(tokens, skipCodeBlock);
 }
