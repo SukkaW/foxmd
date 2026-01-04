@@ -89,7 +89,7 @@ export default async function MarkdownComponent({ slug }: MarkdownComponentProps
       customReactComponentsForHtmlTags: {
         // Here is an example of customizing how `<a>` tag is rendered
         // This is just for demonstration purposes. In real-world usage, since you have already customized the "link" token render method above,
-        //This option will not affect links from markdown (if you have "UNSAFE_allowHtml" enabled, links from inline HTML still apply).
+        // This option will not affect links from markdown (if you have "UNSAFE_allowHtml" enabled, links from inline HTML still apply).
         a: (props) => <Link {...props} />
       },
       // Whether to use `htmlparser2` to parse inline HTML and turn them into React elements, default to false
@@ -109,15 +109,26 @@ export default async function MarkdownComponent({ slug }: MarkdownComponentProps
     // e.g., enabling some Marked.js extensions/plugins that are not supported via options, and here is where you do it
     // Note that not all Marked.js extensions/plugins are compatible with foxmd, since foxmd only uses the Tokenizer/Lexer from Marked.js
     markedInstance: undefined,
+
+    // Want to work with the Table of Contents (TOC)? No problem, foxmd gets you covered.
+    //
+    // foxmd has a built-in slugger that handles slug/id generation and collision avoidance out of the box.
+    //
+    // However, if you want to customize the slug/id generation logic (e.g., working with your existing system),
+    // here is where you can provide your own slug/id generation function.
+    slugize: (str: string) => {
+      // Imagine you have set up a custom slug instance before foxmd() invocation
+      //
+      // import GithubSlugger from 'github-slugger'
+      // const slugger = new GithubSlugger();
+      return slugger.slug(str);
+
+      // It is recommended to create one slugger instance per foxmd() call, so collision avoidance only tracks within
+      // the current markdown content, which is also the foxmd built-in slugger does.
+    }
   });
 
-  // Want to work with the Table of Contents (TOC)? No problem, foxmd gets you covered
-  // foxmd handles slug/id generation and collision avoidance out of the box.
-  //
-  // Currently, slug/id generation is not customizable (have I ever mentioned that foxmd is opinionated?), but PR
-  // is always welcome if you really want a custom slug/id generation logic (e.g., working with your existing system)
-  //
-  // Also, note that the toc is a flat array of headings, with their level and text content.
+  // Note that the toc is a flat array of headings, with their level and text content.
   // Most likely, you will want to convert this flat array into a tree structure.
   // Currently, foxmd does not provide such utilities, but in the future, it may provide one, and as always, PR is welcome.
   console.log({ toc });

@@ -5,7 +5,7 @@ import { createFoxmdRenderer } from './renderer';
 import type { FoxmdRendererOptions } from './renderer';
 import { createFoxmdParser } from './parser';
 import type { FoxmdParserOptions } from './parser';
-import { tokensToText } from './utils';
+import { createSlugger, tokensToText } from './utils';
 
 export type { FoxmdRendererOptions, FoxmdParserOptions };
 export { createFoxmdRenderer, createFoxmdParser };
@@ -38,7 +38,15 @@ export function foxmd(
     tokens = markdownString as MarkedToken[];
   }
 
-  const parser = createFoxmdParser(createFoxmdRenderer(foxmdRendererOptions), foxmdParserOptions);
+  const defaultSlugger = createSlugger();
+
+  const parser = createFoxmdParser(
+    createFoxmdRenderer(foxmdRendererOptions),
+    {
+      slugize: defaultSlugger,
+      ...foxmdParserOptions
+    }
+  );
 
   return isInline ? parser.parseInline(tokens) : parser.parse(tokens);
 }

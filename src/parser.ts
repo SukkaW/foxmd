@@ -3,7 +3,7 @@ import type { MarkedToken } from 'marked';
 import type { HeadingLevels } from './renderer';
 import type { FoxmdRenderer } from './renderer';
 import { decode } from 'html-entities';
-import { slugize, tokensToText } from './utils';
+import { tokensToText } from './utils';
 import type React from 'react';
 
 export interface FoxmdParserParseResult {
@@ -16,17 +16,21 @@ export interface FoxmdParserParseResult {
 }
 
 export interface FoxmdParserOptions {
-  UNSAFE_pickSingleImageChildOutOfParentParagraph?: boolean
+  UNSAFE_pickSingleImageChildOutOfParentParagraph?: boolean,
+  slugize?: (str: string) => string
+}
+
+interface InnerFoxmdParserOptions extends FoxmdParserOptions {
+  slugize: (str: string) => string
 }
 
 export function createFoxmdParser(
   renderer: FoxmdRenderer,
   {
-    UNSAFE_pickSingleImageChildOutOfParentParagraph = false
-  }: FoxmdParserOptions = {}
+    UNSAFE_pickSingleImageChildOutOfParentParagraph = false,
+    slugize
+  }: InnerFoxmdParserOptions
 ) {
-  const headingIds = new Map<string, number>();
-
   const elIdList: number[] = [];
   const incrementElId = () => {
     elIdList[elIdList.length - 1] += 1;
@@ -54,17 +58,7 @@ export function createFoxmdParser(
         case 'heading': {
           const level = token.depth as HeadingLevels;
           const text = tokensToText(token.tokens as MarkedToken[], true);
-          let id = slugize(text);
-
-          let headingIndex = 1;
-          if (headingIds.has(id)) {
-            headingIndex = headingIds.get(id)! + 1;
-            headingIds.set(id, headingIndex);
-
-            id = id + '-' + headingIndex;
-          } else {
-            headingIds.set(id, headingIndex);
-          }
+          const id = slugize(text);
 
           tocObj.push({ text, id, level });
 
@@ -75,7 +69,7 @@ export function createFoxmdParser(
         case 'paragraph': {
           if (
             UNSAFE_pickSingleImageChildOutOfParentParagraph
-            && token.tokens?.length === 1
+            && token.tokens.length === 1
             && token.tokens[0].type === 'image'
           ) {
             return parseInline(token.tokens as MarkedToken[]).jsx;

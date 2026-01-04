@@ -1,3 +1,48 @@
+import { escapeRegexp as escapeRegExp } from 'fast-escape-regexp';
+
+export function createSlugger() {
+  const headingIds = new Map<string, number>();
+
+  return (str: string) => {
+    let id = slugize(str);
+
+    let headingIndex = 1;
+    if (headingIds.has(id)) {
+      headingIndex = headingIds.get(id)! + 1;
+      headingIds.set(id, headingIndex);
+
+      id = id + '-' + headingIndex;
+    } else {
+      headingIds.set(id, headingIndex);
+    }
+
+    return id;
+  };
+}
+
+// eslint-disable-next-line no-control-regex -- escaping
+const rControl = /[\u0000-\u001F]/g;
+const rSpecial = /[\s!"#$%&'()*+,./:;<=>?@[\\\]^_`{|}~-]+/g;
+
+function slugize(str: string) {
+  const separator = '-';
+  const escapedSep = escapeRegExp(separator);
+
+  const result = escapeDiacritic(str)
+    // Remove control characters
+    .replaceAll(rControl, '')
+    // Replace special characters
+    .replaceAll(rSpecial, separator)
+    // Remove continous separators
+    .replaceAll(new RegExp(`${escapedSep}{2,}`, 'g'), separator)
+    // Remove prefixing and trailing separtors
+    .replaceAll(new RegExp(`^${escapedSep}+|${escapedSep}+$`, 'g'), '');
+
+  return result.toLowerCase();
+}
+
+// ----------
+
 export type HtmlTagReplaceReact = {
   [TagName in keyof React.JSX.IntrinsicElements]?: React.ComponentType<React.ComponentPropsWithoutRef<TagName>>;
 };
@@ -18,33 +63,9 @@ export function getHtmlTagReplaceReact(
     : tag;
 }
 
-// eslint-disable-next-line no-control-regex -- escaping
-const rControl = /[\u0000-\u001F]/g;
-const rSpecial = /[\s!"#$%&'()*+,./:;<=>?@[\\\]^_`{|}~-]+/g;
-
-import { escapeRegexp as escapeRegExp } from 'fast-escape-regexp';
 import { never } from 'foxts/guard';
 import { decode } from 'html-entities';
 import type { MarkedToken } from 'marked';
-
-export function slugize(str: string) {
-  if (typeof str !== 'string') throw new TypeError('str must be a string!');
-
-  const separator = '-';
-  const escapedSep = escapeRegExp(separator);
-
-  const result = escapeDiacritic(str)
-    // Remove control characters
-    .replaceAll(rControl, '')
-    // Replace special characters
-    .replaceAll(rSpecial, separator)
-    // Remove continous separators
-    .replaceAll(new RegExp(`${escapedSep}{2,}`, 'g'), separator)
-    // Remove prefixing and trailing separtors
-    .replaceAll(new RegExp(`^${escapedSep}+|${escapedSep}+$`, 'g'), '');
-
-  return result.toLowerCase();
-}
 
 const defaultDiacriticsRemovalap = [
   { base: 'A', letters: '\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F' },
