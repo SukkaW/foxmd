@@ -14,7 +14,6 @@ export interface FoxmdRendererOptions {
   suppressHydrationWarning?: boolean,
   customRenderMethods?: Partial<FoxmdCustomRendererMethods>,
   customReactComponentsForHtmlTags?: HtmlTagReplaceReact,
-  specialImageSizeInTitleOrAlt?: boolean,
   UNSAFE_allowHtml?: boolean
 }
 
@@ -56,7 +55,6 @@ export interface FoxmdCustomRendererMethods {
 
 function createInternalFoxmdRenderer(
   suppressHydrationWarning: boolean,
-  specialImageSizeInTitleOrAlt: boolean,
   customReactComponentsForHtmlTags: HtmlTagReplaceReact,
   UNSAFE_allowHtml: boolean
 ): FoxmdCustomRendererMethods {
@@ -93,31 +91,7 @@ function createInternalFoxmdRenderer(
     },
 
     image(reactKey: string, src: string, alt: string, title?: string) {
-      let width: string | undefined;
-      let height: string | undefined;
-
-      if (specialImageSizeInTitleOrAlt) {
-        if (alt.includes('|')) {
-          const [newAlt, sizeOrImageLocalPath] = alt.split('|');
-          // eslint-disable-next-line @typescript-eslint/prefer-optional-chain -- empty string check
-          if (sizeOrImageLocalPath && sizeOrImageLocalPath.includes('x')) {
-            [width, height] = sizeOrImageLocalPath.split('x').map(i => i.trim());
-            alt = newAlt;
-          }
-        }
-        if (
-          (width === undefined || height === undefined)
-          && title?.includes('size:')
-        ) {
-          title = title.replace(/size:(\d+)x(\d+)/, ($, w, h) => {
-            width = w;
-            height = h;
-            return '';
-          });
-        }
-      }
-
-      return h('img', reactKey, null, { src, alt, title, width, height });
+      return h('img', reactKey, null, { src, alt, title });
     },
 
     codespan(reactKey: string, code: string, lang: string | null = null) {
@@ -217,14 +191,12 @@ function createInternalFoxmdRenderer(
 
 export function createFoxmdRenderer({
   suppressHydrationWarning = false,
-  specialImageSizeInTitleOrAlt = true,
   customRenderMethods = {},
   customReactComponentsForHtmlTags = {},
   UNSAFE_allowHtml = false
 }: FoxmdRendererOptions = {}) {
   const renderer = createInternalFoxmdRenderer(
     suppressHydrationWarning,
-    specialImageSizeInTitleOrAlt,
     customReactComponentsForHtmlTags,
     UNSAFE_allowHtml
   );
