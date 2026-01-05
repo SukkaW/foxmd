@@ -39,7 +39,7 @@ importers:
         specifier: '*'
         version: 19.2.3
       remove-accents:
-        specifier: ^0.5.0
+        specifier: 0.5.0
         version: 0.5.0
     devDependencies:
       '@types/postcss-js':
