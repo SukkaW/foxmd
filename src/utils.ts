@@ -1,23 +1,15 @@
 import { escapeRegexp as escapeRegExp } from 'fast-escape-regexp';
+import { Counter } from 'foxts/counter';
 import { remove as removeDiacritics } from 'remove-accents';
 
 export function createSlugger() {
-  const headingIds = new Map<string, number>();
+  const headingIds = new Counter<string>();
 
   return (str: string) => {
-    let id = slugize(str);
+    const base = slugize(str);
+    const count = headingIds.incr(base).get(base);
 
-    let headingIndex = 1;
-    if (headingIds.has(id)) {
-      headingIndex = headingIds.get(id)! + 1;
-      headingIds.set(id, headingIndex);
-
-      id = id + '-' + headingIndex;
-    } else {
-      headingIds.set(id, headingIndex);
-    }
-
-    return id;
+    return count > 1 ? `${base}-${count}` : base;
   };
 }
 

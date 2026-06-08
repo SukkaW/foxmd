@@ -18,8 +18,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       foxts:
-        specifier: ^5.0.4
-        version: 5.0.4
+        specifier: ^5.5.1
+        version: 5.5.1
       html-entities:
         specifier: ^2.6.0
         version: 2.6.0
@@ -1120,8 +1120,8 @@ packages:
   flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
 
-  foxts@5.0.4:
-    resolution: {integrity: sha512-5NcXkeIE+z8pyNQYW3lfJWR6ig80GkrOcdi3JY3bmzHieQHwpVq7JKYUrsgFjW4lXIitqOYkUF9SRauwlBjIjw==}
+  foxts@5.5.1:
+    resolution: {integrity: sha512-jBm7lzO/D8CK2S/BhVHUbFb4n3NdjkCTRbvHgtqYitFzUYqK2iH6jEQNEI/Erde6WjLnrmZfdxAoIXbkm4pfxA==}
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -1627,7 +1627,7 @@ snapshots:
     dependencies:
       '@package-json/types': 0.0.12
       '@typescript-eslint/utils': 8.50.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      foxts: 5.0.4
+      foxts: 5.5.1
       oxc-resolver: 11.16.0
     transitivePeerDependencies:
       - eslint
@@ -2345,7 +2345,7 @@ snapshots:
       eslint-plugin-promise: 7.2.1(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-regexp: 2.10.0(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-unused-imports: 4.3.0(@typescript-eslint/eslint-plugin@8.50.0(@typescript-eslint/parser@8.50.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))
-      foxts: 5.0.4
+      foxts: 5.5.1
       jsonc-eslint-parser: 2.4.2
       picocolors: 1.1.1
       typescript-eslint: 8.50.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -2362,7 +2362,7 @@ snapshots:
     dependencies:
       ci-info: 4.3.1
       eslint: 9.39.2(jiti@2.6.1)
-      foxts: 5.0.4
+      foxts: 5.5.1
       picocolors: 1.1.1
 
   eslint-import-context@0.1.9(unrs-resolver@1.11.1):
@@ -2460,7 +2460,7 @@ snapshots:
       '@typescript-eslint/types': 8.50.0
       '@typescript-eslint/utils': 8.50.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.2(jiti@2.6.1)
-      foxts: 5.0.4
+      foxts: 5.5.1
     optionalDependencies:
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -2582,7 +2582,7 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  foxts@5.0.4: {}
+  foxts@5.5.1: {}
 
   fsevents@2.3.3:
     optional: true
