@@ -1,7 +1,6 @@
 import type { MarkedToken } from 'marked';
 
-import type { HeadingLevels } from './renderer';
-import type { FoxmdRenderer } from './renderer';
+import type { HeadingLevels, FoxmdRenderer } from './renderer';
 import { decode } from 'html-entities';
 import { tokensToText } from './utils';
 import type React from 'react';

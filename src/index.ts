@@ -56,7 +56,7 @@ function getDefaultMarkedLexerOptions(markedInstance: Marked): MarkedOptions {
     gfm: true,
     breaks: true,
     tokenizer: markedInstance.defaults.tokenizer
-  }) as MarkedOptions;
+  });
 }
 
 export interface MarkdownToTextOptions {
