@@ -1,6 +1,6 @@
 {
   "name": "foxmd",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "An opinionated library that can turn Markdown string into `React.ReactNode[]`",
   "repository": {
     "url": "https://github.com/SukkaW/foxmd"
