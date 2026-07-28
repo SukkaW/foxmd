@@ -131,9 +131,8 @@ export function createFoxmdParser(
             bufferedRawBlockToken += token.text;
             return null;
           }
-
           incrementElId();
-          const node = renderer.html(getReactKey(), bufferedRawBlockToken);
+          const node = renderer.html(getReactKey(), bufferedRawBlockToken + token.text);
           bufferedRawBlockToken = '';
           return node;
         }
@@ -257,7 +256,7 @@ export function createFoxmdParser(
           }
 
           incrementElId();
-          const node = renderer.html(getReactKey(), bufferedRawBlockToken);
+          const node = renderer.html(getReactKey(), bufferedRawBlockToken + token.text);
           bufferedRawBlockToken = '';
           return node;
         }
