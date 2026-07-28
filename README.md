@@ -65,7 +65,7 @@ export default async function MarkdownComponent({ slug }: MarkdownComponentProps
   /** Load your markdown string from file system, CMS, or other sources, in your React Server Component **/
   const markdownString = await fsp.readFile(filePath, 'utf-8');
 
-  const { jsx, toc }: React.ReactNode[] = foxmd(markdownString, {
+  const { jsx, toc } = foxmd(markdownString, {
     // Whether to parse markdown as inline or as block, default to false (block)
     isInline: false,
     // Options for rendering markdown tokens

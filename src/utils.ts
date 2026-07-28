@@ -14,7 +14,7 @@ export function createSlugger() {
 }
 
 // eslint-disable-next-line no-control-regex -- escaping
-const rControl = /[\u0000-\u001F]/g;
+const rControl = /[\u{0}-\u{1F}]/gu;
 const rSpecial = /[\s!"#$%&'()*+,./:;<=>?@[\\\]^_`{|}~-]+/g;
 
 function slugize(str: string) {
@@ -26,9 +26,9 @@ function slugize(str: string) {
     .replaceAll(rControl, '')
     // Replace special characters
     .replaceAll(rSpecial, separator)
-    // Remove continous separators
+    // Remove continuous separators
     .replaceAll(new RegExp(`${escapedSep}{2,}`, 'g'), separator)
-    // Remove prefixing and trailing separtors
+    // Remove prefixing and trailing separators
     .replaceAll(new RegExp(`^${escapedSep}+|${escapedSep}+$`, 'g'), '');
 
   return result.toLowerCase();

@@ -40,11 +40,11 @@
   "dependencies": {
     "domhandler": "^5.0.3",
     "fast-escape-regexp": "^1.0.1",
-    "foxts": "^5.8.0",
+    "foxts": "^5.8.1",
     "html-entities": "^2.6.0",
     "htmlparser2": "^10.1.0",
     "marked": "^15.0.12",
-    "postcss": "^8.5.19",
+    "postcss": "^8.5.24",
     "postcss-js": "^5.1.0",
     "remove-accents": "0.5.0"
   },
@@ -52,10 +52,10 @@
     "@types/postcss-js": "^4.1.0",
     "@types/react": "^19.2.17",
     "bumpp": "^10.4.1",
-    "bunchee": "^6.12.0",
-    "eslint": "^10.7.0",
-    "eslint-config-sukka": "^8.13.5",
-    "eslint-formatter-sukka": "^8.13.5",
+    "bunchee": "^6.12.2",
+    "eslint": "^10.8.0",
+    "eslint-config-sukka": "^8.14.2",
+    "eslint-formatter-sukka": "^8.14.2",
     "html-tags": "^5.1.0",
     "typescript": "^6.0.3"
   },
@@ -63,5 +63,5 @@
     "@types/react": "*",
     "react": "*"
   },
-  "packageManager": "pnpm@11.12.0"
+  "packageManager": "pnpm@11.17.0"
 }
